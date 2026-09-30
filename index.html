@@ -2199,7 +2199,7 @@
             <h3 id="ov-leave">What you'll leave with</h3>
             <ul class="ticklist">
               <li>Your own <code>agents-outreach-team</code> folder: four agents you built and can keep using</li>
-              <li>A cold email draft for your top target, plus drafts for five more, ready for you to review and send</li>
+              <li>A cold email draft for your top target, plus drafts for the rest of your list when you get to Round 4, ready for you to review and send</li>
               <li>A pattern you can reuse for other multi-step work</li>
             </ul>
           </div>
@@ -2256,13 +2256,13 @@
         <div class="task" data-level="beginner">
           <p>Copy each prompt and paste it into Claude, one at a time. Wait for each file to be created before sending the next.</p>
           <div class="files" data-files="base"></div>
+          <p>One piece of shorthand first. <code>&lt;slug&gt;</code> means the company name in lowercase with hyphens, so Stripe becomes <code>stripe</code> and Acme Robotics becomes <code>acme-robotics</code>. It is all through <code>CLAUDE.md</code>, and every run gets its own folder named that way.</p>
           <p>Now read <code>CLAUDE.md</code> end to end. It is short, and every agent you are about to build works from it. If you are not sure how to open a file yet, paste this:</p>
           <div class="cmd">Open CLAUDE.md and show me the whole file.</div>
           <div class="note">
             <span class="note-label">You won't see .claude in Finder</span>
             <p>Folders whose name starts with a dot are hidden by your file browser, so <code>.claude</code> is there but invisible. Ask Claude when you want to look inside it: <em>List everything in .claude/ and show me settings.json.</em></p>
           </div>
-          <p>One piece of shorthand before you do: <code>&lt;slug&gt;</code> means the company name in lowercase with hyphens, so Stripe becomes <code>stripe</code> and Acme Robotics becomes <code>acme-robotics</code>. Every run gets its own folder named that way.</p>
         </div>
 
         <div class="task" data-level="intermediate">
@@ -2277,7 +2277,7 @@
           <p>Then write down which agent your rule constrains, and how you would know it was obeyed. You are checking that prediction in Round 1, so be specific about what you expect to see in the files. Keep it somewhere you will find it again:</p>
           <div class="cmd">Append this to notes/predictions.md, creating the file if it does not exist: [my rule, which agent I think it constrains, and what a violation would look like in the file].</div>
           <p>Pick a rule you expect the pipeline to break at least sometimes. A rule about something a 110-word email was never going to contain comes back obeyed and teaches you nothing. If you cannot say what a violation would look like in the file, pick a different rule.</p>
-          <p>The mechanism, so you are predicting rather than guessing: subagents inherit this file the same way your main session does, so a rule you put here reaches all four of them. That is what makes it a rulebook rather than a note to yourself.</p>
+          <p>The mechanism, so you are predicting rather than guessing: subagents inherit this file the same way your main session does, so a rule you put here reaches all three of them, and the fourth one you add in Round 3. That is what makes it a rulebook rather than a note to yourself.</p>
         </div>
 
         <div class="task" data-level="advanced">
@@ -2464,7 +2464,7 @@ and the output path runs/thin-test/02-draft.md</div>
         </div>
         <p>Once you're back in, ask Claude:</p>
         <div class="cmd">Without opening any files, list the subagents you can delegate to right now. For each one, give its description and the exact tools it is allowed to use.</div>
-        <p>You will see more than three. Claude Code ships with its own helpers, with names like general-purpose, Explore and Plan, and those have always been there. What you are checking is that <code>researcher</code>, <code>writer</code> and <code>editor</code> are in the list too, and that the tools are right: web search and web fetch for the Researcher, read and write only for the other two. The tool lists are the point. They live inside your agent files and nowhere else, so a session that loaded nothing cannot answer without opening them.</p>
+        <p>You will see more than three. Claude Code ships with its own helpers, with names like general-purpose, Explore and Plan, and those have always been there. What you are checking is that <code>researcher</code>, <code>writer</code> and <code>editor</code> are in the list too, and that the tools are right: the Researcher has web search and web fetch on top of read and write, and the other two have read and write only. The web tools are the tell. The tool lists are the point. They live inside your agent files and nowhere else, so a session that loaded nothing cannot answer without opening them.</p>
         <div class="note">
           <span class="note-label">Why "without opening any files" is doing the work</span>
           <p><code>CLAUDE.md</code> names all three agents and is already open, so asking for names alone gets you the right answer whether or not a single agent loaded. The agent files are on disk either way too, so a session that can read them can report anything in them. The only thing that separates a loaded session from an unloaded one is what it can tell you <em>without looking</em>.</p>
@@ -2502,7 +2502,7 @@ and the output path runs/thin-test/02-draft.md</div>
         </div>
         <div class="files" data-files="me"></div>
         <ul>
-          <li><code>me/background.md</code>: three lines. Where you were before, what you're aiming for, one proof point.</li>
+          <li><code>me/background.md</code>: four lines. Where you were before, what you're aiming for, one proof point, and the name you sign off as. Leave the last one blank and your email ships unsigned.</li>
           <li><code>me/voice-samples.md</code>: two short emails you've actually sent. The Editor copies your sentence length, formality, and sign-off.</li>
         </ul>
         <p>They arrive as templates, with placeholder lines you have to replace. Paste this and answer the questions Claude asks you:</p>
@@ -2541,7 +2541,7 @@ and the output path runs/thin-test/02-draft.md</div>
         <div class="files" data-run></div>
         <div class="note">
           <span class="note-label">Read it before you paste</span>
-          <p>Open <em>Show the full prompt</em>. Notice what the manager never hands between agents: the contents of a file. It passes the company, the role, the date and the recipient's name, and everything else is a path. No agent is ever handed what another agent wrote, only where to find it, and that is what keeps each agent's context clean. You'll paste this same prompt again in Rounds 2 and 3.</p>
+          <p>Open <em>Show the full prompt</em>. Notice what the manager never hands between agents: the contents of a file. It passes the company, the role, the date and the recipient's name, and everything else is a path. No agent is ever handed what another agent wrote, only where to find it, and that is what keeps each agent's context clean. You'll paste this same prompt again in Round 3, and in Round 2 only if you edit the Researcher.</p>
         </div>
         <div class="note">
           <span class="note-label">What to expect while it runs</span>
@@ -2637,7 +2637,7 @@ and the output path runs/thin-test/02-draft.md</div>
           <p>If you edited the <strong>Researcher</strong>, there is nothing to carry forward. Paste the full run prompt again with the same target, and expect a different brief. That is your change.</p>
           <details class="bail">
             <summary>If Claude has lost the thread, or you restarted since Round 1</summary>
-            <p>Paste the prompt in the dark box above on its own. It does not need the full run prompt: Claude still has <code>CLAUDE.md</code> and knows the agents.</p>
+            <p>Paste the re-run prompt above again on its own. Claude still has <code>CLAUDE.md</code> and knows your agents, so it does not need the full run prompt. The card below is here only for the case where you edited the Researcher.</p>
             <div class="files" data-run></div>
           </details>
         </div>
@@ -2733,6 +2733,12 @@ score, then the three numbers. Comment on nothing else.</div>
           <h2 tabindex="-1">Add a fourth agent</h2>
         </header>
         <p class="lede">A recruiter who gets forty cold emails a week and replies to two. Add a fourth agent file alongside the first three:</p>
+        <div data-level="intermediate">
+          <div class="note">
+            <span class="note-label">Your Round 2 edit is still in the file</span>
+            <p>It will shape everything in this round, and it should. If the Recruiter objects to something you recognise as your own rule, that is the most useful review you will get today.</p>
+          </div>
+        </div>
         <div class="note">
           <span class="note-label">No restart this time</span>
           <p><code>.claude/agents/</code> already exists, so Claude Code notices <code>recruiter.md</code> within seconds of you creating it. Step 04 needed a restart because the folder itself was new. That is the difference it was teaching you, and you are on the other side of it now.</p>
@@ -2740,7 +2746,7 @@ score, then the three numbers. Comment on nothing else.</div>
         </div>
         <div class="task" data-level="beginner">
           <div class="files" data-files="recruiter"></div>
-          <p>Then paste the run prompt once more, same target:</p>
+          <p>Then paste the run prompt once more, same target. This is a full run, so the Researcher searches again and you get a fresh brief. That is fine, and it is why this round takes about as long as Round 1 did.</p>
           <div class="files" data-run></div>
         </div>
 
@@ -2787,6 +2793,7 @@ score, then the three numbers. Comment on nothing else.</div>
           </details>
         </div>
 
+        <p>This round writes to its own folder. If you followed Round 2 as written, Round 1 took <code>runs/stripe/</code>, Round 2 took <code>runs/stripe-2/</code>, and this one is <code>runs/stripe-3/</code>. Claude names the folder when it finishes, and both verdicts are in there.</p>
         <p>The Recruiter scores the final email out of 10. Under 8 sends it back to the Writer for exactly one revision, then the Editor, then the Recruiter scores it again. Read both verdicts:</p>
         <ol class="list">
           <li><code>04-review.md</code>: the first score and its objections</li>
@@ -2807,6 +2814,7 @@ score, then the three numbers. Comment on nothing else.</div>
         <div class="note">
           <span class="note-label">Where the review actually goes</span>
           <p>Back to the Writer, and only the Writer. So an objection about length, the subject line or the voice lands on the agent that does not own it, and the Editor never sees the review at all. Watch for a fix that appears in <code>02-draft-v2.md</code> and is gone again by <code>03-final-v2.md</code>, because the Editor's own rules cut it back.</p>
+          <p>An objection about <em>you</em> is the same problem in a different place. If the Recruiter wants a decision you owned, the Writer cannot invent one: it may only say what is in <code>me/background.md</code>, which no agent can edit. That objection belongs to you and the file.</p>
           <p>The worst case is an objection about the facts. If the Recruiter says the hook is not specific enough, that belongs to the Researcher, and the Writer cannot fix it: no web access, and no way to send anything back a step. Watch for the same objection surviving the revision word for word. When it does, you have found the strongest argument for routing a review by whichever agent owns the problem.</p>
         </div>
         <div class="note">
@@ -2933,7 +2941,7 @@ score, then the three numbers. Comment on nothing else.</div>
           <span class="mono-label">Questions to sit with</span>
           <ol class="list">
             <li>Where would you <strong>split</strong> one of these agents in two, or <strong>merge</strong> two into one?</li>
-            <li>Which agent would you move to a cheaper model? Change it and run it again before you answer. To make the change, paste: <em>Open <code>.claude/agents/[agent name].md</code> and change the line <code>model: sonnet</code> to <code>model: haiku</code>. Change nothing else, then show me the line you changed.</em></li>
+            <li>Which agent would you move to a cheaper model? Change it and run it again before you answer. To make the change, replace the square brackets, including the brackets themselves, with the agent's name, then paste: <em>Open <code>.claude/agents/[agent name].md</code> and change the line <code>model: sonnet</code> to <code>model: haiku</code>. Change nothing else, then show me the line you changed.</em></li>
             <li>You pasted the same run prompt over and over today. What would you want instead? And what would have to be true for the pipeline to run on its own?</li>
           </ol>
           <div class="answer">
@@ -3070,6 +3078,7 @@ An agent pipeline that turns a company and a role into one cold email. It exists
       "Read",
       "Edit(runs/**)",
       "Edit(me/**)",
+      "Edit(notes/**)",
       "Edit(CLAUDE.md)",
       "Edit(.claude/**)",
       "Edit(targets.md)",
@@ -3204,7 +3213,7 @@ You are the manager. Follow CLAUDE.md.
 4. Write `runs/batch-summary.md`: for each target, the company, the score if there is one, and the final email. Then tell me in the chat which targets finished, which failed and why, and where the summary is. Do not send anything.
 </script>
 
-<script type="text/plain" data-id="bg-template" data-path="me/background.md" data-verify="me/background.md" data-hint="A template. You fill in the three lines">
+<script type="text/plain" data-id="bg-template" data-path="me/background.md" data-verify="me/background.md" data-hint="A template. You fill in the four lines">
 # Your background
 
 Only the Writer reads this file. Four lines is enough.
