@@ -2227,7 +2227,7 @@
         </ul>
         <div class="note">
           <span class="note-label">Set your model to Sonnet</span>
-          <p><strong>Before you start, switch your main Claude Code session to Sonnet</strong>, using the model picker in your session, or by typing <code>/model</code> and choosing Sonnet from the list. Nothing in this workshop needs a bigger model, and a bigger one will eat through your usage limits well before the last round.</p>
+          <p><strong>Before you start, switch your main Claude Code session to Sonnet</strong>, using the model dropdown next to the send button, or by typing <code>/model</code> and choosing Sonnet from the list. Nothing in this workshop needs a bigger model, and a bigger one will eat through your usage limits well before the last round.</p>
           <p>The agents you are about to build run on Sonnet too. Every agent file carries the line <code>model: sonnet</code>, so the Researcher, the Writer, the Editor and the Recruiter all use it whatever your session is set to. Choosing Sonnet now means the whole pipeline, manager and agents alike, is running the same model.</p>
         </div>
         <p>There's nothing to download for this workshop. You'll build every file yourself, from this page.</p>
@@ -2401,7 +2401,7 @@
 
           <div class="note">
             <span class="note-label">Restart before the test below</span>
-            <p>You created <code>.claude/agents/</code> a few minutes ago, inside a session that started before it existed, so your agents are not loaded yet and the delegation below will quietly do nothing useful. End the session and open the folder again first. Step 04 explains why, and this is the same thing one step early.</p>
+            <p>You created <code>.claude/agents/</code> a few minutes ago, inside a session that started before it existed, so your agents are not loaded yet and the delegation below will quietly do nothing useful. Start a new session on the same folder first, the way Step 04 describes: <strong>+ New session</strong> in the sidebar, not a reopened app. Step 04 explains why, and this is the same thing one step early.</p>
           </div>
           <p>Then prove one of your decisions holds. Your Writer is supposed to be unable to invent facts about the company. Test it with a brief that gives it almost nothing:</p>
           <ol class="list">
@@ -2455,9 +2455,23 @@ and the output path runs/thin-test/02-draft.md</div>
           <div class="step-meta"><span class="step-n">Step 04</span></div>
           <h2 tabindex="-1">Restart, then check the team loaded</h2>
         </header>
-        <p class="lede"><strong>End this session and start a new one on the same <code>agents-outreach-team</code> folder.</strong> This step isn't optional.</p>
-        <p>In the desktop app that means closing this session and opening a new one on the same folder from the Code tab. If you are not sure, quit the app and open it again on the folder.</p>
-        <p>Nothing you have built lives in the chat. It is all files on disk, so closing the session loses none of it.</p>
+        <p class="lede"><strong>Start a brand new session on the same <code>agents-outreach-team</code> folder.</strong> This step isn't optional, and it is the one step people get wrong.</p>
+        <div class="note">
+          <span class="note-label">Quitting the app is not enough</span>
+          <p>Closing the window, or quitting Claude entirely, does not end your session. It is saved, and opening the app again drops you straight back into it, with your whole conversation still there and your agents still not loaded. You need a <em>new</em> session, not a reopened one.</p>
+        </div>
+        <p>In the Claude desktop app, in the <strong>Code</strong> tab:</p>
+        <ol class="list">
+          <li>Click <strong>+ New session</strong> at the top of the sidebar on the left. The keyboard shortcut is <strong>Cmd+N</strong> on a Mac, <strong>Ctrl+N</strong> on Windows.</li>
+          <li>In the new session's prompt box, set the <strong>project folder</strong> to your <code>agents-outreach-team</code> folder, the same one you have been working in.</li>
+          <li>Set the model to <strong>Sonnet</strong> again, in the dropdown next to the send button. A new session does not inherit it.</li>
+        </ol>
+        <div class="note">
+          <span class="note-label">How to tell it worked</span>
+          <p>The chat is empty. If you can still scroll up and see the prompts you pasted in the last three steps, you are in the old session and nothing has changed. Start again from step 1.</p>
+        </div>
+        <p>Your old session is still in the sidebar, and nothing you have built lives in the chat anyway. Every file is on disk, so this loses none of it.</p>
+        <p>Working in a terminal instead? Type <code>/exit</code>, then run <code>claude</code> again in the same folder. Reopening with <code>claude --continue</code> or <code>--resume</code> puts you back in the old session, which is exactly what you are trying to avoid.</p>
         <div class="note">
           <span class="note-label">Why the restart is required</span>
           <p>Claude Code watches <code>.claude/agents/</code> and picks up new or edited agents within seconds. The catch: it only watches folders that already existed when the session started. You created that folder a minute ago, inside a session that began before it existed, so nothing is watching it yet. Nothing will warn you either. Your main session will simply have no agents to hand work to.</p>
@@ -2483,7 +2497,7 @@ and the output path runs/thin-test/02-draft.md</div>
         </div>
         <div class="note">
           <span class="note-label">If it comes back empty</span>
-          <p>If <code>researcher</code>, <code>writer</code> and <code>editor</code> are missing from the list, or Claude offers to read the files instead of answering, the restart did not take. Check that your files are at <code>.claude/agents/researcher.md</code>, <code>writer.md</code> and <code>editor.md</code> inside the <code>agents-outreach-team</code> folder, then end the session and start a new one again. Seeing helpers you did not create is not a problem.</p>
+          <p>If <code>researcher</code>, <code>writer</code> and <code>editor</code> are missing from the list, or Claude offers to read the files instead of answering, the restart did not take. Check that your files are at <code>.claude/agents/researcher.md</code>, <code>writer.md</code> and <code>editor.md</code> inside the <code>agents-outreach-team</code> folder, then start another new session with <strong>+ New session</strong>. Seeing helpers you did not create is not a problem.</p>
         </div>
       </section>
 
@@ -2742,7 +2756,7 @@ score, then the three numbers. Comment on nothing else.</div>
         <div class="note">
           <span class="note-label">No restart this time</span>
           <p><code>.claude/agents/</code> already exists, so Claude Code notices <code>recruiter.md</code> within seconds of you creating it. Step 04 needed a restart because the folder itself was new. That is the difference it was teaching you, and you are on the other side of it now.</p>
-          <p>If Claude does say it cannot find a <code>recruiter</code> subagent, run the check prompt from Step 04. If the recruiter is missing from that list, end the session and start a new one, and it will be there.</p>
+          <p>If Claude does say it cannot find a <code>recruiter</code> subagent, run the check prompt from Step 04. If the recruiter is missing from that list, start a new session with <strong>+ New session</strong>, the way Step 04 describes, and it will be there.</p>
         </div>
         <div class="task" data-level="beginner">
           <div class="files" data-files="recruiter"></div>
