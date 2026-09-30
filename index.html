@@ -2692,8 +2692,8 @@ When you have it all, write both files, keep the headings exactly as they are, a
         </div>
 
         <div class="task" data-level="beginner">
-          <p>Pick one agent and change its prompt. The Editor is the easiest place to see a difference. Replace the square brackets, including the brackets themselves, with your change in one sentence, then paste it:</p>
-          <div class="cmd">Open .claude/agents/editor.md and show me the file. Then make one change: [describe your change in one sentence]. Change nothing else, keep the block between the two --- markers exactly as it is, and show me the lines you changed when you are done.</div>
+          <p>Pick one agent and change its prompt. The Editor is the easiest place to see a difference. This prompt asks you which one and what to change, so there is nothing to fill in first:</p>
+          <div class="cmd">I want to change one of my agents. Ask me which one, and what the one change is. Then open that file, show it to me, make that change and nothing else, keep the block between the two --- markers exactly as it is, and show me the lines you changed.</div>
           <p>Some starting points:</p>
           <ul>
             <li>Make the Editor match your voice far more aggressively by naming the specific habits it should copy.</li>
@@ -2701,19 +2701,18 @@ When you have it all, write both files, keep the headings exactly as they are, a
             <li>Change the Writer's ask from a 15-minute call to a single question.</li>
             <li>Ban a word you hate. Add a rule about length. Give it a rule for when the brief is thin.</li>
           </ul>
-          <p>Now run the same target again, reusing the brief from Round 1 rather than researching afresh. That way the only thing that changed is the agent you edited:</p>
-          <div class="cmd">Run the pipeline again for the same target, and change only the agent I edited. Copy the brief and the draft from my last run's folder into a new run folder, then delegate to the editor alone: give it that draft, that brief, me/voice-samples.md, and a new 03-final.md in the same new folder. Tell me both folder names when you are done.</div>
-          <p>The new run lands in its own folder, <code>runs/&lt;company&gt;-2/</code>, and Round 1's folder is left alone. Read the two <code>03-final.md</code> files side by side. Same brief, same draft, one different Editor, so anything that moved is your edit.</p>
+          <p>Now run the same target again. This prompt asks which agent you changed, then keeps everything above it and re-runs from it down, so the only difference between the two runs is your edit:</p>
+          <div class="cmd">Run the pipeline again for the same target, in a new run folder, and change only the agent I edited.
+
+First ask me which agent I changed. Then copy forward from my last run's folder every file produced before that agent's step, run that agent and every agent after it, and leave my last run's folder untouched. Tell me both folder names when you are done.</div>
           <div class="note">
-            <span class="note-label">If you edited the Writer or the Researcher instead</span>
-            <p>Carry forward only what sits above the agent you changed.</p>
-            <p>If you edited the <strong>Writer</strong>, paste this instead of the prompt above:</p>
+            <span class="note-label">Why it asks</span>
+            <p>Everything upstream of the agent you changed can be reused, and everything from it down has to run again. Change the Editor and the brief and the draft carry over. Change the Writer and only the brief does. Change the Researcher and nothing does, because the new brief <em>is</em> your change. One rule, three shapes, and Claude works out which one applies once it knows the answer.</p>
           </div>
-          <div class="cmd">Run the pipeline again for the same target, and change only the agent I edited. Copy the brief from my last run's folder into a new run folder, then delegate to the writer with that brief, me/background.md and a new 02-draft.md in the new folder, and then to the editor with that new draft, that brief, me/voice-samples.md and a new 03-final.md. Tell me both folder names when you are done.</div>
-          <p>If you edited the <strong>Researcher</strong>, there is nothing to carry forward. Paste the full run prompt again with the same target, and expect a different brief. That is your change.</p>
+          <p>The new run lands in its own folder, <code>runs/&lt;company&gt;-2/</code>, and Round 1's folder is left alone. Read the two <code>03-final.md</code> files side by side.</p>
           <details class="bail">
             <summary>If Claude has lost the thread, or you restarted since Round 1</summary>
-            <p>Paste the re-run prompt above again on its own. Claude still has <code>CLAUDE.md</code> and knows your agents, so it does not need the full run prompt. The card below is here only for the case where you edited the Researcher.</p>
+            <p>Paste the re-run prompt above again on its own. Claude still has <code>CLAUDE.md</code> and knows your agents, so it does not need the full run prompt. The card below is a fallback if it has forgotten the target too.</p>
             <div class="files" data-run></div>
           </details>
         </div>
@@ -2724,24 +2723,26 @@ When you have it all, write both files, keep the headings exactly as they are, a
             <span class="note-label">Get your noise floor first</span>
             <p>Run the same target twice with nothing changed, reusing the brief both times. The difference between those two finals is what this pipeline does on its own, before you touch anything. Any change smaller than that is not your edit, it is the weather.</p>
           </div>
-          <div class="cmd">Run the pipeline again for the same target, but do not research and do not redraft. Copy the brief and the draft from my last run's folder into a new run folder, then delegate to the editor alone: give it that draft, that brief, me/voice-samples.md, and a new 03-final.md in the same folder. Name the folder the way the run prompt does, with a -2 or -3 suffix, and tell me which folder you used.</div>
-          <p>Paste that twice. You now have two folders that differ by nothing at all: same brief, same draft, same Editor. Look at the difference before you change anything:</p>
+          <div class="cmd">I am about to change one of the agents, but not yet. First ask me which one. Then run the same target twice more with nothing changed at all, each into its own new run folder: copy forward from my last run every file produced before that agent's step, and re-run that agent and everything after it. Tell me the two folder names.</div>
+          <p>Two folders that differ by nothing, and they re-ran exactly the part your edit is going to move. Look at the difference before you change anything:</p>
           <div class="cmd">Show me the differences between the 03-final.md files in the last two run folders, and tell me which folders you compared.</div>
           <p>That is your noise floor. Two identical runs, and it is probably still several lines. Hold that number in your head when you read the next diff.</p>
           <div class="note">
             <span class="note-label">Then pick an edit big enough to beat it</span>
             <p>A rule about the shape of the output, like the length of the subject line or a word the Editor may not use, is checkable against what you just saw. A change to tone or formality is not: every line will move, and you will not be able to tell your edit from the weather.</p>
           </div>
-          <p>Now change one thing in one agent, reusing the brief so only the agent moves:</p>
-          <div class="cmd">Open .claude/agents/editor.md and show me the file. Then make one change: [describe your change in one sentence]. Change nothing else, keep the block between the two --- markers exactly as it is.</div>
+          <p>Now make the change:</p>
+          <div class="cmd">Open the agent file I named a moment ago and show it to me. Then make one change, which I will describe when you ask, and nothing else. Keep the block between the two --- markers exactly as it is, and show me the lines you changed.</div>
           <p>Before you run anything, write down two predictions where you can check them later:</p>
           <ul>
             <li>Whether anything outside the part you touched moves at all. You changed one rule; the Editor rewrites the whole email every time.</li>
             <li>One specific phrase you expect to appear or disappear in the final email.</li>
           </ul>
-          <p>Now run it once more, exactly the way you ran the two baselines. Same brief, same target, one agent changed:</p>
-          <div class="cmd">Run the pipeline again for the same target, and change only the agent I edited. Copy the brief and the draft from my last run's folder into a new run folder, then delegate to the editor alone: give it that draft, that brief, me/voice-samples.md, and a new 03-final.md in the same new folder. Tell me both folder names when you are done.</div>
-          <p>That is three runs on one brief: two with nothing changed, one with your edit. If you edited the Writer or the Researcher instead, carry forward only what sits above it, and run from there down.</p>
+          <p>Now run it once more, exactly the way you ran the two baselines, with the edit in place:</p>
+          <div class="cmd">Run the pipeline again for the same target, in a new run folder, and change only the agent I edited.
+
+First ask me which agent I changed. Then copy forward from my last run's folder every file produced before that agent's step, run that agent and every agent after it, and leave my last run's folder untouched. Tell me both folder names when you are done.</div>
+          <p>That is three runs of the same slice of the pipeline: two with nothing changed, one with your edit. Anything bigger than the gap between the first two is yours.</p>
           <p>Then have Claude put the two finals side by side:</p>
           <div class="cmd">Show me the differences between the last two runs' 03-final.md files, and tell me which folders you compared.</div>
           <p>Check your predictions against the diff. The interesting question is the last one: how much of that difference is your edit, and how much would have happened anyway?</p>
