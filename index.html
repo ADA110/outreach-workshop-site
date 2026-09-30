@@ -1544,6 +1544,8 @@
 
   .ext-body p { margin: 0; }
 
+  .ask-note { margin: 14px 0 0; font-size: 14px; color: var(--ink-2); }
+
   .bail {
     border: 1px dashed var(--line-strong);
     border-radius: 10px;
@@ -2933,6 +2935,7 @@ score, then the three numbers. Comment on nothing else.</div>
             <li>Which agent would you move to a cheaper model? Change it and run it again before you answer. To make the change, replace the square brackets, including the brackets themselves, with the agent's name, then paste: <em>Open <code>.claude/agents/[agent name].md</code> and change the line <code>model: sonnet</code> to <code>model: haiku</code>. Change nothing else, then show me the line you changed.</em></li>
             <li>You pasted the same run prompt over and over today. What would you want instead? And what would have to be true for the pipeline to run on its own?</li>
           </ol>
+          <p class="ask-note">Mark this step complete and the finish screen has a few of these written up as things to try at home: running it over a batch of jobs and companies, letting the revision loop keep going until the score is good enough, and having it learn who you are from your CV rather than from three lines you typed.</p>
           <div class="answer">
             <div class="answer-text" aria-hidden="true" tabindex="-1">
               <p><strong>1. Split when one agent does two jobs badly; merge when a handoff adds cost without adding a check.</strong> If briefs contain mistakes, split the Researcher into a finder and a verifier. If the Editor barely changes the Writer's drafts, merging them saves a whole agent.</p>
@@ -2958,14 +2961,43 @@ score, then the three numbers. Comment on nothing else.</div>
           <p>Each of these is a self-contained afternoon. Nothing here is required, and nothing here is harder than what you have already done.</p>
 
           <details class="ext">
-            <summary><b>Run it over a whole list at once</b><span>Batching</span></summary>
+            <summary><b>Run it for several jobs, and for a batch of jobs and companies</b><span>Batching</span></summary>
             <div class="ext-body">
-              <p>One target at a time is the slow way. The same pipeline can take a list of companies and roles and work through all of them, with the Researchers running at the same time because none of them needs anything from the others, and everything after that in order per target, because each step reads the file the step before it wrote.</p>
+              <p>One target at a time is the slow way. The same pipeline can take a list and work through all of it: several roles at one company, several companies, or both at once. The Researchers run at the same time, because none of them needs anything from the others, and everything after that goes in order per target, because each step reads the file the step before it wrote.</p>
               <p>Start with a target list, one per line:</p>
               <div class="files" data-files="targets"></div>
               <p>Then hand the manager a prompt that loops over it instead of running once:</p>
               <div class="files" data-files="batch"></div>
               <p>Three things worth watching when you run it. Which parts actually happen in parallel and which quietly do not. What a run costs when it is twenty targets rather than one. And what happens when two targets share a company, since the folder name is built from the company alone.</p>
+            </div>
+          </details>
+
+          <details class="ext">
+            <summary><b>Let the loop keep going until the email is good enough</b><span>Quality gate</span></summary>
+            <div class="ext-body">
+              <p>Today the revision loop fires exactly once. The Recruiter scores under 8, the Writer gets one more pass, the Editor tidies it, the Recruiter scores again, and that is the end of it whatever the second number says. Change that so the Writer, Editor and Recruiter keep going round until the score reaches 8, instead of stopping after one attempt.</p>
+              <p>It is a small edit to the run prompt and it opens three real problems:</p>
+              <ul>
+                <li><strong>It can run forever.</strong> A rubric the email cannot satisfy loops until you stop it. Give it a ceiling, three or four attempts, and decide what happens when it gives up: keep the best-scoring version, or keep the last one, and say which in the summary.</li>
+                <li><strong>The score can rise while the email gets worse.</strong> That is Round 3's lesson, and a loop that runs until 8 gives it far more room to happen. Read the final attempt against the first one, not just the numbers.</li>
+                <li><strong>The review still only reaches the Writer.</strong> Objections about length, the subject line or the voice belong to the Editor, which never sees them. Over five attempts that mismatch compounds instead of passing once.</li>
+              </ul>
+              <p>Worth logging every score in the run folder as you go, so you can see whether the loop is converging or just wandering.</p>
+            </div>
+          </details>
+
+          <details class="ext">
+            <summary><b>Let it learn who you are from your CV and LinkedIn</b><span>Your own material</span></summary>
+            <div class="ext-body">
+              <p>Right now everything the pipeline knows about you is three lines you wrote by hand. Point it at the real thing instead: your CV, your LinkedIn profile, an old cover letter you were happy with. A new agent reads them and writes <code>me/background.md</code> for you, and the Writer carries on unchanged, because it only ever reads that one file.</p>
+              <p>That is the clean version of the idea, and it is worth doing that way round rather than handing your whole CV to the Writer. One agent digests, one agent writes, and the file between them stays small and checkable.</p>
+              <p>Things to look at once it works:</p>
+              <ul>
+                <li><strong>What it got wrong about you.</strong> A CV is a list of claims without weight. The proof point it picks is often not the one you would have picked, and that disagreement is useful.</li>
+                <li><strong>Whether the emails get better or just longer.</strong> More material about you is not automatically a better hook.</li>
+                <li><strong>What you are now feeding into a model.</strong> Your CV has your address and phone number on it more often than not. Strip what you would not paste into a chat window.</li>
+              </ul>
+              <p>Your voice samples stay yours either way. A CV tells it what you have done, not how you write.</p>
             </div>
           </details>
         </section>
