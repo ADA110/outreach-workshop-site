@@ -1827,29 +1827,26 @@
   /* A checkpoint is a waypoint with a star in it. The circle still carries
      the state: outlined ahead of you, inked once you have been there. */
   .rail-item.checkpoint .node::after {
-    content: "\2605";
-    width: auto;
-    height: auto;
-    background: none;
+    content: "";
+    width: 10px;
+    height: 10px;
     border-radius: 0;
-    font-size: 9.5px;
-    line-height: 1;
-    color: var(--map-trail);
+    background: var(--map-trail);
+    -webkit-mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3E%3Cpath d='M8.00 2.93 9.45 6.54 13.33 6.80 10.34 9.30 11.29 13.07 8.00 11.00 4.71 13.07 5.66 9.30 2.67 6.80 6.55 6.54Z'/%3E%3C/svg%3E") center / contain no-repeat;
+    mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3E%3Cpath d='M8.00 2.93 9.45 6.54 13.33 6.80 10.34 9.30 11.29 13.07 8.00 11.00 4.71 13.07 5.66 9.30 2.67 6.80 6.55 6.54Z'/%3E%3C/svg%3E") center / contain no-repeat;
   }
 
-  .rail-item.checkpoint.done .node::after { color: var(--map-paper); }
-  .rail-item.checkpoint.locked .node::after { color: var(--map-trail); }
+  .rail-item.checkpoint.done .node::after { background: var(--map-paper); }
+  .rail-item.checkpoint.locked .node::after { background: var(--map-trail); }
 
   /* The current marker is a pin, so its star has to be turned back upright. */
   .rail-item.checkpoint.current .node::after {
-    color: var(--map-paper);
+    background: var(--map-paper);
     transform: rotate(45deg);
   }
 
   .fork .star {
-    font-size: 7px;
     fill: var(--map-paper);
-    text-anchor: middle;
     opacity: 0;
     pointer-events: none;
   }
@@ -2256,7 +2253,7 @@
           <ol class="phases">
             <li class="ms"><span class="ph-when">Steps 01 to 05</span><b>Build the team</b><p>What an agent is: a prompt plus a set of tools, in one file. How Claude Code loads agents, and why you'll restart once.</p></li>
             <li class="ms"><span class="ph-when">Round 1</span><b>Run it</b><p>How your main session hands out work, and how agents pass it along through files.</p></li>
-            <li><span class="ph-when">Round 2</span><b>Change it</b><p>How editing one agent changes every agent after it.</p></li>
+            <li><span class="ph-when">Round 2</span><b>Tweak it</b><p>How a small change to one agent moves the email, and every agent after it.</p></li>
             <li class="ms"><span class="ph-when">Round 3</span><b>Grow it</b><p>How to add an agent without rewriting the rest.</p></li>
             <li class="ms"><span class="ph-when">Debrief</span><b>Look back</b><p>Where you'd split or merge agents, and which ones could run on a cheaper model.</p></li>
           </ol>
@@ -2683,16 +2680,12 @@ When you have it all, write both files, keep the headings exactly as they are, a
         </div>
       </section>
 
-      <section class="step" data-step="r2" data-label="Round 2" data-title="Round 2: Rewrite one agent" hidden>
+      <section class="step" data-step="r2" data-label="Round 2" data-title="Round 2: Tweak one agent" hidden>
         <header class="step-head">
           <div class="step-meta"><span class="step-n">Round 2</span></div>
-          <h2 tabindex="-1">Rewrite one agent</h2>
+          <h2 tabindex="-1">Tweak one agent</h2>
         </header>
-        <p class="lede">Your three agents exist and you've seen them run. Now change one and watch what it does.</p>
-        <div class="note">
-          <span class="note-label">Where most people are when the session ends</span>
-          <p>Here or just past here on the Beginner track, and usually in the middle of this round on Intermediate and Advanced, which both ask for extra runs before you can read anything. That is the expected outcome, not a failure. Rounds 3 and 4 are the two worth finishing at home, and your progress is saved for when you do.</p>
-        </div>
+        <p class="lede">Your three agents exist and you've seen them run. The email they produced is probably close but not quite what you would have written. This round is where you push it towards what you actually want, by tweaking one agent and watching what moves.</p>
         <div class="note">
           <span class="note-label">Round 1's output is safe</span>
           <p>Every run writes to a fresh folder, <code>runs/stripe-2/</code> and so on, because the project never overwrites a previous run. Editing an agent takes effect without restarting, and so does adding a new one, now that <code>.claude/agents/</code> exists. Step 04 was the one restart you needed, and it was needed because the folder itself was new.</p>
@@ -3978,9 +3971,9 @@ Sam
       '<circle class="dot dot-beginner" cx="6" cy="15" r="4.4"/>' +
       '<circle class="dot dot-intermediate" cx="18" cy="15" r="4.4"/>' +
       '<circle class="dot dot-advanced" cx="30" cy="15" r="4.4"/>' +
-      '<text class="star star-beginner" x="6" y="17.6">\u2605</text>' +
-      '<text class="star star-intermediate" x="18" y="17.6">\u2605</text>' +
-      '<text class="star star-advanced" x="30" y="17.6">\u2605</text>' +
+      '<path class="star star-beginner" d="M6.00 12.56 6.70 14.30 8.57 14.42 7.13 15.62 7.59 17.44 6.00 16.45 4.41 17.44 4.87 15.62 3.43 14.42 5.30 14.30Z"/>' +
+      '<path class="star star-intermediate" d="M18.00 12.56 18.70 14.30 20.57 14.42 19.13 15.62 19.59 17.44 18.00 16.45 16.41 17.44 16.87 15.62 15.43 14.42 17.30 14.30Z"/>' +
+      '<path class="star star-advanced" d="M30.00 12.56 30.70 14.30 32.57 14.42 31.13 15.62 31.59 17.44 30.00 16.45 28.41 17.44 28.87 15.62 27.43 14.42 29.30 14.30Z"/>' +
       '<path class="tick tick-beginner" d="M3.9 15.1 l1.5 1.6 l2.9 -3.3"/>' +
       '<path class="tick tick-intermediate" d="M15.9 15.1 l1.5 1.6 l2.9 -3.3"/>' +
       '<path class="tick tick-advanced" d="M27.9 15.1 l1.5 1.6 l2.9 -3.3"/>' +
@@ -4365,13 +4358,19 @@ Sam
         inkLeg(ORDER.indexOf(id));
 
         if (MILESTONES[id]) {
-          var r = seg.getBoundingClientRect();
           if (MILESTONES[id] === 2) {
             burst(innerWidth * .22, innerHeight * .9, 110, 17, 1.2);
             setTimeout(function () { burst(innerWidth * .78, innerHeight * .9, 110, 17, 1.2); }, 180);
             setTimeout(function () { burst(innerWidth * .5, innerHeight * .95, 90, 19, .9); }, 380);
           } else {
-            burst(r.left + r.width / 2, r.bottom + 4, 80, 10, 2.4);
+            /* From the stamp you just earned, not from the progress bar at the
+               top of the screen, where most of it flew off-screen unseen. */
+            var mark = $(".postmark", sec) || $(".complete", sec) || sec;
+            var r = mark.getBoundingClientRect();
+            var bx = Math.min(Math.max(r.left + r.width / 2, 40), innerWidth - 40);
+            var by = Math.min(Math.max(r.top + r.height / 2, 120), innerHeight - 80);
+            burst(bx, by, 90, 13, 2.2);
+            setTimeout(function () { burst(bx, by, 50, 9, 2.8); }, 140);
           }
         }
         return wait(reduceMotion ? 0 : 380);
