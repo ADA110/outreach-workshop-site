@@ -2582,8 +2582,14 @@ and the output path runs/thin-test/02-draft.md</div>
           <li><code>me/background.md</code>: four lines. Where you were before, what you're aiming for, one proof point, and the name you sign off as. Leave the last one blank and your email ships unsigned.</li>
           <li><code>me/voice-samples.md</code>: two short emails you've actually sent. The Editor copies your sentence length, formality, and sign-off.</li>
         </ul>
-        <p>They arrive as templates, with placeholder lines you have to replace. Paste this and answer the questions Claude asks you:</p>
-        <div class="cmd">Open me/background.md and me/voice-samples.md and show me both. Then replace the placeholder lines with my real content, one file at a time, asking me for anything you do not already know. Leave the headings as they are.</div>
+        <p>They arrive as templates, with placeholder lines in them. You do not have to fill those in yourself. Paste this and Claude will interview you until both files are done:</p>
+        <div class="cmd">Interview me until you have everything you need to fill in both of my files, then write them.
+
+Open me/background.md and me/voice-samples.md and show me what is in them now. Then ask me questions one at a time, waiting for each answer before you ask the next. Keep going until you have all of it: where I was before, what I am aiming for, one proof point with a real number in it if I have one, the name I sign off as, and two short emails I have actually sent to someone I did not know well.
+
+Do not stop before you have everything. Do not hand the files back half filled in, and do not tell me to write any of it myself. If an answer of mine is vague, ask a follow-up instead of accepting it. If I cannot find a sent email, ask me about the last message I wrote to a stranger and work from that.
+
+When you have it all, write both files, keep the headings exactly as they are, and show me what you wrote so I can correct it. Invent nothing: everything in those files has to be something I told you.</div>
         <div class="note">
           <span class="note-label">Check the placeholders are gone</span>
           <p>The templates contain the literal words <code>(paste here)</code>. Nothing errors if you leave them, and nothing warns you: the Editor will simply treat <code>(paste here)</code> as a sample of how you write. Open both files and look before you move on.</p>
