@@ -1680,6 +1680,28 @@
 
   .back-btn { font-size: 14px; padding: 8px 14px; border-radius: 9px; }
 
+  .skip-btn {
+    font-family: var(--f-body);
+    font-size: 14px;
+    color: var(--ink-2);
+    background: none;
+    border: 1px solid var(--line-strong);
+    border-radius: 9px;
+    padding: 8px 14px;
+    cursor: pointer;
+  }
+
+  .skip-btn:hover { border-color: var(--ink-2); color: var(--ink); }
+
+  .opt-pill {
+    font-family: var(--f-mono);
+    font-size: 11.5px;
+    color: var(--ink-2);
+    border: 1px solid var(--line-strong);
+    border-radius: 99px;
+    padding: 1px 10px;
+  }
+
   /* postmark */
 
   .postmark {
@@ -2687,6 +2709,10 @@ When you have it all, write both files, keep the headings exactly as they are, a
         </header>
         <p class="lede">Your three agents exist and you've seen them run. The email they produced is probably close but not quite what you would have written. This round is where you push it towards what you actually want, by tweaking one agent and watching what moves.</p>
         <div class="note">
+          <span class="note-label">This round is optional</span>
+          <p>You can go straight to Round 3 and nothing later depends on having done this. It is worth doing anyway. You wrote those three agents blind, before you had seen a single email come out of them, so the first result is almost never the one you had in mind. This is where you close that gap, and changing one thing and watching what moves is the habit you will use every time you build something like this.</p>
+        </div>
+        <div class="note">
           <span class="note-label">Round 1's output is safe</span>
           <p>Every run writes to a fresh folder, <code>runs/stripe-2/</code> and so on, because the project never overwrites a previous run. Editing an agent takes effect without restarting, and so does adding a new one, now that <code>.claude/agents/</code> exists. Step 04 was the one restart you needed, and it was needed because the folder itself was new.</p>
         </div>
@@ -3376,6 +3402,9 @@ Sam
     debrief: "You built a four-agent pipeline from an empty folder."
   };
   var START_MSG = "Twelve steps between you and a working agent team.";
+
+  /* Steps you can walk past. */
+  var OPTIONAL = { r2: 1 };
 
   /* Steps that earn confetti on top of the stamp. */
   var MILESTONES = { restart: 1, r1: 1, r3: 1, debrief: 2 };
@@ -4245,6 +4274,15 @@ Sam
     $("small", btn).textContent = next ? "Next: " + TITLES[next] : "Finish the workshop";
     btn.addEventListener("click", function () { completeStep(id); });
     foot.appendChild(btn);
+
+    if (OPTIONAL[id]) {
+      var skip = document.createElement("button");
+      skip.type = "button";
+      skip.className = "skip-btn";
+      skip.textContent = "Skip this one →";
+      skip.addEventListener("click", function () { completeStep(id); });
+      foot.appendChild(skip);
+    }
   }
 
   /* ---------- moving between steps ---------- */
@@ -4668,6 +4706,13 @@ Sam
 
 
 
+
+  Object.keys(OPTIONAL).forEach(function (id) {
+    var pill = document.createElement("span");
+    pill.className = "opt-pill";
+    pill.textContent = "Optional";
+    $(".step-meta", sections[id]).appendChild(pill);
+  });
 
   Object.keys(MILESTONES).forEach(function (id) {
     segs[id].classList.add("milestone");
