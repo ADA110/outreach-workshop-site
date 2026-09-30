@@ -128,3 +128,14 @@ Deliberate caps in `lib/store.js`, all adjustable:
 | Email length | 120 characters |
 | Feedback comment | 2,000 characters |
 | Room data kept | 30 days after last write |
+
+## Deploying
+
+Pushing to `main` deploys to production. The Vercel project is connected to
+this repository, so no local CLI is involved and no one's laptop has to be
+awake. Work on a branch when a change is not ready to be live: a branch push
+gets a preview URL instead.
+
+Environment variables live in Vercel, not here. `INSTRUCTOR_KEY` gates
+`/instructor`, and the Upstash Redis credentials arrive through the
+Marketplace integration.
