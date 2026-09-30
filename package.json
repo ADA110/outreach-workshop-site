@@ -1,0 +1,10 @@
+{
+  "name": "outreach-workshop-site",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "description": "Student-facing guide for the Outreach Team multi-agent workshop.",
+  "dependencies": {
+    "@upstash/redis": "^1.38.3"
+  }
+}

@@ -1,0 +1,868 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex, nofollow">
+<title>Instructor Console</title>
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Ctext y='.9em' font-size='90'%3E%F0%9F%93%8B%3C/text%3E%3C/svg%3E">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500;12..96,700&family=IBM+Plex+Mono:wght@400;500&family=IBM+Plex+Sans:wght@400;500;600&display=swap">
+
+<style>
+  :root {
+    --ground: #E9DDC2;
+    --surface: #F6EDD9;
+    --surface-2: #E3D6B8;
+    --ink: #33281A;
+    --ink-2: #55452E;
+    --muted: #6E5C42;
+    --line: #D3C4A2;
+    --line-strong: #B5A27B;
+    --accent: #A05A15;
+    --accent-soft: #F3E5C6;
+    --done: #2F6B4A;
+    --bar: #12805A;
+    --plan: #9B3B2E;
+    --warn-ink: #8A3A1E;
+    --shadow: 0 1px 2px rgba(90, 68, 38, .10), 0 8px 24px -14px rgba(90, 68, 38, .28);
+
+    --f-display: "Bricolage Grotesque", ui-sans-serif, system-ui, sans-serif;
+    --f-body: "IBM Plex Sans", ui-sans-serif, system-ui, sans-serif;
+    --f-mono: "IBM Plex Mono", ui-monospace, "SF Mono", Menlo, monospace;
+
+    /* Same paper as the workshop; one theme only. */
+    color-scheme: light;
+  }
+
+  [hidden] { display: none !important; }
+  * { box-sizing: border-box; }
+
+  body {
+    margin: 0;
+    background-color: var(--ground);
+    background-image:
+      radial-gradient(520px 300px at 10% 4%, rgba(150, 120, 80, .10), transparent 70%),
+      radial-gradient(620px 380px at 90% 30%, rgba(150, 120, 80, .08), transparent 70%);
+    background-attachment: fixed;
+    color: var(--ink);
+    font-family: var(--f-body);
+    font-size: 15px;
+    line-height: 1.5;
+    -webkit-font-smoothing: antialiased;
+  }
+
+  button, input {
+    font-family: var(--f-body);
+    font-size: 13.5px;
+    color: var(--ink);
+  }
+
+  button {
+    background: var(--surface);
+    border: 1px solid var(--line-strong);
+    border-radius: 7px;
+    padding: 6px 12px;
+    cursor: pointer;
+    font-weight: 500;
+  }
+
+  button:hover { border-color: var(--ink-2); }
+  button:focus-visible, input:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+
+  input {
+    background: var(--surface);
+    border: 1px solid var(--line-strong);
+    border-radius: 7px;
+    padding: 6px 10px;
+  }
+
+  .mono { font-family: var(--f-mono); font-size: 12px; color: var(--muted); }
+
+  h1, h2 { font-family: var(--f-display); letter-spacing: -.015em; margin: 0; }
+
+  /* ---------- key gate ---------- */
+
+  .gate { min-height: 100vh; display: grid; place-items: center; padding: 24px; }
+
+  .gate form {
+    width: min(400px, 100%);
+    background: var(--surface);
+    border: 1px solid var(--line);
+    border-radius: 14px;
+    padding: 28px;
+    box-shadow: var(--shadow);
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+  }
+
+  .gate h1 { font-size: 24px; }
+  .gate p { margin: 0; color: var(--ink-2); font-size: 14px; }
+  .gate input { font-size: 15px; padding: 10px 12px; }
+
+  .gate .primary {
+    background: var(--ink);
+    color: var(--ground);
+    border-color: var(--ink);
+    padding: 10px;
+    font-size: 15px;
+  }
+
+  .gate .err { color: var(--warn-ink); font-size: 13.5px; }
+
+  /* ---------- header ---------- */
+
+  .top {
+    position: sticky;
+    top: 0;
+    z-index: 10;
+    background: var(--surface);
+    border-bottom: 1px solid var(--line);
+  }
+
+  .top-in {
+    max-width: 1240px;
+    margin: 0 auto;
+    padding: 12px 24px;
+    display: flex;
+    align-items: center;
+    gap: 12px 18px;
+    flex-wrap: wrap;
+  }
+
+  .brand { font-family: var(--f-display); font-weight: 700; font-size: 17px; }
+  .top-in .spacer { flex: 1 1 auto; }
+  .room { display: flex; align-items: center; gap: 8px; }
+  .room input { width: 150px; }
+
+  .live-dot {
+    width: 7px; height: 7px;
+    border-radius: 99px;
+    background: var(--done);
+    display: inline-block;
+    margin-right: 6px;
+  }
+
+  .live-dot.stale { background: var(--line-strong); }
+
+  /* ---------- layout ---------- */
+
+  main {
+    max-width: 1240px;
+    margin: 0 auto;
+    padding: 24px 24px 64px;
+    display: grid;
+    grid-template-columns: repeat(12, minmax(0, 1fr));
+    gap: 18px;
+  }
+
+  .tiles { grid-column: 1 / -1; display: grid; grid-template-columns: repeat(5, minmax(0, 1fr)); gap: 12px; }
+
+  .tile {
+    background: var(--surface);
+    border: 1px solid var(--line);
+    border-radius: 12px;
+    padding: 14px 16px 16px;
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+  }
+
+  .tile .k { font-family: var(--f-mono); font-size: 11px; letter-spacing: .06em; text-transform: uppercase; color: var(--muted); }
+  .tile .v { font-family: var(--f-display); font-size: 30px; font-weight: 700; font-variant-numeric: tabular-nums; line-height: 1.15; }
+  .tile .s { font-size: 12.5px; color: var(--muted); }
+
+  .panel {
+    background: var(--surface);
+    border: 1px solid var(--line);
+    border-radius: 12px;
+    padding: 18px 20px 20px;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    min-width: 0;
+  }
+
+  .span-7 { grid-column: span 7; }
+  .span-5 { grid-column: span 5; }
+  .span-12 { grid-column: 1 / -1; }
+
+  .panel h2 { font-size: 18px; }
+  .panel .sub { margin: -6px 0 0; font-size: 13px; color: var(--muted); max-width: 70ch; }
+  .panel-head { display: flex; align-items: center; justify-content: space-between; gap: 12px; flex-wrap: wrap; }
+
+  .empty { color: var(--muted); font-size: 14px; padding: 12px 0; }
+
+  /* ---------- bar rows (one axis per chart) ---------- */
+
+  .rows { display: flex; flex-direction: column; gap: 6px; }
+
+  .row {
+    display: grid;
+    grid-template-columns: minmax(150px, 210px) minmax(0, 1fr) 84px;
+    gap: 12px;
+    align-items: center;
+    font-size: 13px;
+    padding: 2px 0;
+  }
+
+  .row .lab { color: var(--ink-2); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .row .lab .ms { color: var(--accent); margin-left: 4px; }
+  .row .val { font-family: var(--f-mono); font-size: 12px; color: var(--ink-2); font-variant-numeric: tabular-nums; text-align: right; white-space: nowrap; }
+
+  .track { position: relative; height: 16px; cursor: default; }
+
+  .track::before {
+    content: "";
+    position: absolute;
+    inset: 7px 0 auto;
+    height: 2px;
+    background: var(--surface-2);
+    border-radius: 2px;
+  }
+
+  .fill {
+    position: absolute;
+    left: 0;
+    top: 1px;
+    height: 14px;
+    background: var(--bar);
+    border-radius: 0 4px 4px 0;
+    min-width: 2px;
+  }
+
+  .plan {
+    position: absolute;
+    top: -2px;
+    width: 3px;
+    height: 20px;
+    margin-left: -1.5px;
+    background: var(--plan);
+    border-radius: 2px;
+    box-shadow: 0 0 0 2px var(--surface);
+  }
+
+  .here {
+    display: inline-block;
+    font-family: var(--f-mono);
+    font-size: 11px;
+    color: var(--ink);
+    background: var(--accent-soft);
+    border-radius: 99px;
+    padding: 0 7px;
+  }
+
+  .axis {
+    display: grid;
+    grid-template-columns: minmax(150px, 210px) minmax(0, 1fr) 84px;
+    gap: 12px;
+    font-family: var(--f-mono);
+    font-size: 11px;
+    color: var(--muted);
+  }
+
+  .axis .ticks { position: relative; height: 14px; border-top: 1px solid var(--line); }
+  .axis .ticks span { position: absolute; top: 2px; transform: translateX(-50%); }
+
+  .legend { display: flex; gap: 16px; flex-wrap: wrap; font-size: 12.5px; color: var(--ink-2); }
+  .legend span { display: inline-flex; align-items: center; gap: 7px; }
+  .sw-bar { width: 14px; height: 10px; border-radius: 0 3px 3px 0; background: var(--bar); }
+  .sw-plan { width: 3px; height: 14px; border-radius: 2px; background: var(--plan); }
+
+  /* ---------- lists ---------- */
+
+  .help-list, .fb-list { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 8px; }
+
+  .help-list li {
+    display: flex;
+    gap: 10px;
+    align-items: baseline;
+    justify-content: space-between;
+    padding: 9px 12px;
+    background: var(--ground);
+    border-radius: 9px;
+    font-size: 13.5px;
+  }
+
+  .help-list b { font-weight: 600; }
+  .help-list .where { color: var(--muted); font-size: 12.5px; }
+  .help-list .over { font-family: var(--f-mono); font-size: 12px; color: var(--warn-ink); white-space: nowrap; }
+
+  .fb-list li {
+    padding: 12px 14px;
+    background: var(--ground);
+    border-radius: 10px;
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
+  }
+
+  .fb-stars { color: var(--accent); letter-spacing: 1px; font-size: 15px; }
+  .fb-stars em { font-style: normal; color: var(--muted); font-family: var(--f-mono); font-size: 11.5px; letter-spacing: 0; margin-left: 8px; }
+  .fb-text { margin: 0; font-size: 14px; color: var(--ink); white-space: pre-wrap; }
+  .fb-text.none { color: var(--muted); font-style: italic; }
+  .fb-who { font-size: 12px; color: var(--muted); }
+
+  /* ---------- students table ---------- */
+
+  .table-wrap { overflow-x: auto; }
+  table { width: 100%; border-collapse: collapse; font-size: 13.5px; min-width: 820px; }
+
+  th {
+    text-align: left;
+    font-family: var(--f-mono);
+    font-size: 11px;
+    letter-spacing: .06em;
+    text-transform: uppercase;
+    color: var(--muted);
+    font-weight: 500;
+    padding: 8px 10px 8px 0;
+    border-bottom: 1px solid var(--line);
+  }
+
+  td { padding: 9px 10px 9px 0; border-bottom: 1px solid var(--line); vertical-align: middle; }
+  td.num { font-family: var(--f-mono); font-size: 12.5px; font-variant-numeric: tabular-nums; white-space: nowrap; }
+  td.email { color: var(--ink-2); }
+  td .done-tag { font-family: var(--f-mono); font-size: 11px; color: var(--done); }
+
+  .pips { display: inline-flex; gap: 3px; margin-right: 8px; vertical-align: middle; }
+  .pip { width: 10px; height: 10px; border-radius: 3px; background: var(--surface-2); border: 1px solid var(--line); }
+  .pip.on { background: var(--done); border-color: var(--done); }
+
+  .controls { display: flex; gap: 8px; align-items: center; flex-wrap: wrap; }
+  .controls input { width: 220px; }
+
+  /* ---------- tooltip ---------- */
+
+  .tip {
+    position: fixed;
+    z-index: 50;
+    pointer-events: none;
+    background: var(--ink);
+    color: var(--ground);
+    font-size: 12.5px;
+    line-height: 1.4;
+    padding: 7px 10px;
+    border-radius: 7px;
+    box-shadow: var(--shadow);
+    max-width: 280px;
+  }
+
+  @media (max-width: 1000px) {
+    .span-7, .span-5 { grid-column: 1 / -1; }
+    .tiles { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  }
+
+  @media (max-width: 640px) {
+    main, .top-in { padding-left: 16px; padding-right: 16px; }
+    .row, .axis { grid-template-columns: 110px minmax(0, 1fr) 64px; gap: 8px; }
+  }
+</style>
+</head>
+<body>
+
+<div class="gate" id="gate" hidden>
+  <form id="gate-form" autocomplete="off">
+    <h1>Instructor console</h1>
+    <p>Enter the instructor key to see student progress, emails, and feedback. The key stays on this device.</p>
+    <input id="key" type="password" placeholder="Instructor key" aria-label="Instructor key" autocomplete="current-password">
+    <button class="primary" type="submit">Unlock</button>
+    <p class="err" id="gate-err" role="alert" hidden></p>
+  </form>
+</div>
+
+<div id="dash" hidden>
+  <header class="top">
+    <div class="top-in">
+      <span class="brand">Instructor console</span>
+      <span class="mono">agents-outreach-team</span>
+      <span class="spacer"></span>
+      <label class="room"><span class="mono">Room</span>
+        <input id="room" list="room-list" spellcheck="false" aria-label="Room">
+        <datalist id="room-list"></datalist>
+      </label>
+      <span class="mono" id="updated"><span class="live-dot stale"></span>Loading</span>
+      <button type="button" id="export">Export CSV</button>
+      <button type="button" id="lock">Lock</button>
+    </div>
+  </header>
+
+  <main>
+    <section class="tiles" id="tiles" aria-label="Summary"></section>
+
+    <section class="panel span-7" aria-labelledby="h-where">
+      <h2 id="h-where">Where the room is</h2>
+      <p class="sub">How many students have finished each step. The tag on the right counts who is working on that step right now.</p>
+      <div class="rows" id="where"></div>
+    </section>
+
+    <section class="panel span-5" aria-labelledby="h-help">
+      <h2 id="h-help">Taking longer than planned</h2>
+      <p class="sub">Students on their current step for more than 1.5 times its planned length, counted from their last finished step. Worth a walk over.</p>
+      <div id="help"></div>
+    </section>
+
+    <section class="panel span-7" aria-labelledby="h-time">
+      <h2 id="h-time">Time per step</h2>
+      <p class="sub">Median minutes students took to finish each step, against the time planned for it.</p>
+      <div class="legend" aria-hidden="true"><span><i class="sw-bar"></i>Median time taken</span><span><i class="sw-plan"></i>Planned time</span></div>
+      <div class="rows" id="time"></div>
+    </section>
+
+    <section class="panel span-5" aria-labelledby="h-rating">
+      <h2 id="h-rating">Ratings</h2>
+      <p class="sub" id="rating-sub">From the finish screen.</p>
+      <div class="rows" id="rating"></div>
+    </section>
+
+    <section class="panel span-12" aria-labelledby="h-mix">
+      <h2 id="h-mix">How people are working</h2>
+      <p class="sub">Share of students who took Intermediate or Advanced on each step, of those who finished it. Useful for deciding which steps are worth deepening next time.</p>
+      <div class="rows" id="mix"></div>
+    </section>
+
+    <section class="panel span-12" aria-labelledby="h-fb">
+      <h2 id="h-fb">Feedback</h2>
+      <div id="feedback"></div>
+    </section>
+
+    <section class="panel span-12" aria-labelledby="h-students">
+      <div class="panel-head">
+        <h2 id="h-students">Students</h2>
+        <div class="controls">
+          <input id="filter" type="search" placeholder="Filter by name or email" aria-label="Filter students">
+          <label class="mono">Sort
+            <select id="sort" aria-label="Sort students">
+              <option value="progress">Progress</option>
+              <option value="name">Name</option>
+              <option value="active">Last active</option>
+            </select>
+          </label>
+        </div>
+      </div>
+      <div class="table-wrap">
+        <table>
+          <thead><tr><th>Name</th><th>Email</th><th>Level</th><th>Progress</th><th>Current step</th><th>Joined</th><th>Last active</th><th>Rating</th></tr></thead>
+          <tbody id="students"></tbody>
+        </table>
+      </div>
+    </section>
+  </main>
+</div>
+
+<div class="tip" id="tip" role="tooltip" hidden></div>
+
+<script>
+(function () {
+  "use strict";
+
+  var KEY_STORE = "outreach-instructor-key";
+  var TITLES = {
+    overview: "What you're building", prep: "Before you start", folder: "Make the folder",
+    base: "Rules and permissions", agents: "Create the three agents", restart: "Restart and check",
+    me: "Your two files", r1: "Round 1: Run it", r2: "Round 2: Rewrite one agent",
+    r3: "Round 3: Add a fourth agent", r4: "Round 4: Batch", debrief: "Debrief"
+  };
+  /* Planned minutes, matching the student page. Setup has no set length. */
+  var PLANNED = { overview: 4, prep: 0, folder: 3, base: 3, agents: 5, restart: 2, me: 5, r1: 12, r2: 10, r3: 10, r4: 5, debrief: 5 };
+  var MILESTONES = { restart: 1, r1: 1, r3: 1, debrief: 1 };
+  var WORDS = ["", "Not useful", "Needs work", "Okay", "Good", "Great"];
+  var LEVEL_LABEL = { beginner: "Beginner", intermediate: "Intermediate", advanced: "Advanced" };
+
+  var params = new URLSearchParams(location.search);
+  var room = cleanRoom(params.get("room"));
+  var key = "";
+  try { key = localStorage.getItem(KEY_STORE) || ""; } catch (e) {}
+
+  var data = null;
+  var timer = null;
+  var lastOk = 0;
+
+  function $(s) { return document.querySelector(s); }
+  function cleanRoom(v) { return (String(v || "default").toLowerCase().replace(/[^a-z0-9-]/g, "").slice(0, 40)) || "default"; }
+  function esc(s) {
+    return String(s == null ? "" : s).replace(/[&<>"']/g, function (c) {
+      return { "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c];
+    });
+  }
+
+  function ago(iso, now) {
+    if (!iso) return "never";
+    var m = Math.round((now - new Date(iso).getTime()) / 60000);
+    if (m < 1) return "just now";
+    if (m < 60) return m + " min ago";
+    var h = Math.round(m / 60);
+    return h < 48 ? h + " h ago" : Math.round(h / 24) + " days ago";
+  }
+
+  function median(xs) {
+    if (!xs.length) return null;
+    var s = xs.slice().sort(function (a, b) { return a - b; });
+    var mid = Math.floor(s.length / 2);
+    return s.length % 2 ? s[mid] : (s[mid - 1] + s[mid]) / 2;
+  }
+
+  /* ---------- gate ---------- */
+
+  function showGate(msg) {
+    stop();
+    $("#dash").hidden = true;
+    $("#gate").hidden = false;
+    var err = $("#gate-err");
+    err.textContent = msg || "";
+    err.hidden = !msg;
+    $("#key").value = "";
+    $("#key").focus();
+  }
+
+  $("#gate-form").addEventListener("submit", function (e) {
+    e.preventDefault();
+    key = $("#key").value.trim();
+    if (!key) return;
+    try { localStorage.setItem(KEY_STORE, key); } catch (err) {}
+    load(true);
+  });
+
+  $("#lock").addEventListener("click", function () {
+    key = "";
+    try { localStorage.removeItem(KEY_STORE); } catch (e) {}
+    showGate("");
+  });
+
+  /* ---------- fetching ---------- */
+
+  function load(first) {
+    return fetch("/api/instructor?room=" + encodeURIComponent(room), {
+      headers: { "x-instructor-key": key, Accept: "application/json" },
+      cache: "no-store"
+    })
+      .then(function (r) {
+        return r.json().catch(function () { return {}; }).then(function (j) { return { status: r.status, body: j }; });
+      })
+      .then(function (res) {
+        if (res.status === 401) {
+          try { localStorage.removeItem(KEY_STORE); } catch (e) {}
+          return showGate("That key isn't right. Check it and try again.");
+        }
+        if (res.status === 503 && res.body.error === "instructor_key_unconfigured") {
+          return showGate("This site has no instructor key set yet. Add INSTRUCTOR_KEY in Vercel and redeploy.");
+        }
+        if (!res.body.ok) throw new Error(res.body.message || "Request failed");
+        data = res.body;
+        lastOk = Date.now();
+        $("#gate").hidden = true;
+        $("#dash").hidden = false;
+        render();
+        if (first) start();
+      })
+      .catch(function () {
+        markStale("Can't reach the server. Retrying.");
+      });
+  }
+
+  function start() {
+    stop();
+    timer = setInterval(function () { if (!document.hidden) load(false); }, 5000);
+  }
+
+  function stop() { clearInterval(timer); timer = null; }
+
+  document.addEventListener("visibilitychange", function () { if (!document.hidden && key && data) load(false); });
+
+  function markStale(msg) {
+    $("#updated").innerHTML = '<span class="live-dot stale"></span>' + esc(msg);
+  }
+
+  /* ---------- room picker ---------- */
+
+  var roomIn = $("#room");
+  roomIn.value = room;
+  function changeRoom() {
+    var next = cleanRoom(roomIn.value);
+    roomIn.value = next;
+    if (next === room) return;
+    room = next;
+    history.replaceState(null, "", "?room=" + encodeURIComponent(room));
+    data = null;
+    load(false);
+  }
+  roomIn.addEventListener("change", changeRoom);
+  roomIn.addEventListener("keydown", function (e) { if (e.key === "Enter") changeRoom(); });
+
+  /* ---------- derived numbers ---------- */
+
+  function currentStep(s, steps) {
+    for (var i = 0; i < steps.length; i++) if (!s.steps[steps[i]]) return steps[i];
+    return null;
+  }
+
+  function derive() {
+    var steps = data.steps;
+    var now = new Date(data.now).getTime();
+    var fbBy = {};
+    data.feedback.forEach(function (f) { fbBy[f.id] = f; });
+
+    var students = data.students.map(function (s) {
+      var cur = currentStep(s, steps);
+      var lastDone = null;
+      steps.forEach(function (id) { if (s.stepAt[id] && (!lastDone || s.stepAt[id] > lastDone)) lastDone = s.stepAt[id]; });
+      var since = lastDone || s.joinedAt;
+      return {
+        name: s.name, email: s.email, id: s.id, steps: s.steps, stepAt: s.stepAt,
+        level: s.level || "beginner", levels: s.levels || {},
+        done: s.doneCount, cur: cur, finished: !cur,
+        joinedAt: s.joinedAt, updatedAt: s.updatedAt,
+        onStepMin: since ? (now - new Date(since).getTime()) / 60000 : null,
+        fb: fbBy[s.id] || null
+      };
+    });
+
+    /* Minutes each student took per step: from the previous completion (or
+       joining) to this one. Medians keep one long lunch from skewing it. */
+    var durations = {};
+    steps.forEach(function (id) { durations[id] = []; });
+    data.students.forEach(function (s) {
+      var anchor = s.joinedAt ? new Date(s.joinedAt).getTime() : null;
+      steps.forEach(function (id) {
+        if (!s.stepAt[id]) return;
+        var t = new Date(s.stepAt[id]).getTime();
+        if (anchor !== null && t >= anchor) durations[id].push((t - anchor) / 60000);
+        anchor = t;
+      });
+    });
+
+    return { steps: steps, now: now, students: students, durations: durations };
+  }
+
+  /* ---------- rendering ---------- */
+
+  function render() {
+    var d = derive();
+    var n = d.students.length;
+    var ratings = data.feedback.map(function (f) { return f.rating; }).filter(Boolean);
+    var avgRating = ratings.length ? ratings.reduce(function (a, b) { return a + b; }, 0) / ratings.length : null;
+    var finished = d.students.filter(function (s) { return s.finished; }).length;
+    var avgProgress = n ? Math.round(d.students.reduce(function (a, s) { return a + s.done; }, 0) / (n * d.steps.length) * 100) : 0;
+    var active = d.students.filter(function (s) { return s.updatedAt && d.now - new Date(s.updatedAt).getTime() < 10 * 60000; }).length;
+
+    $("#updated").innerHTML = '<span class="live-dot"></span>Updated ' + new Date(lastOk).toLocaleTimeString([], { hour: "numeric", minute: "2-digit", second: "2-digit" });
+
+    var rooms = (data.rooms || []).slice();
+    if (rooms.indexOf(room) < 0) rooms.push(room);
+    $("#room-list").innerHTML = rooms.map(function (r) { return '<option value="' + esc(r) + '">'; }).join("");
+
+    tiles([
+      ["Students", n, n ? "signed in" : "none yet"],
+      ["Finished", finished, n ? Math.round(finished / n * 100) + "% of the room" : "no one yet"],
+      ["Average progress", avgProgress + "%", "of all " + d.steps.length + " steps"],
+      ["Active", active, "finished a step in the last 10 min"],
+      ["Average rating", avgRating ? avgRating.toFixed(1) : "none", ratings.length ? "from " + ratings.length + " rating" + (ratings.length === 1 ? "" : "s") : "no ratings yet"]
+    ]);
+
+    renderWhere(d, n);
+    renderHelp(d);
+    renderTime(d);
+    renderMix(d);
+    renderRatings(ratings, avgRating);
+    renderFeedback(d);
+    renderStudents(d);
+  }
+
+  function tiles(list) {
+    $("#tiles").innerHTML = list.map(function (t) {
+      return '<div class="tile"><span class="k">' + esc(t[0]) + '</span><span class="v">' + esc(t[1]) +
+        '</span><span class="s">' + esc(t[2]) + "</span></div>";
+    }).join("");
+  }
+
+  function label(id) {
+    return esc(TITLES[id] || id) + (MILESTONES[id] ? '<span class="ms" title="Milestone">★</span>' : "");
+  }
+
+  function renderWhere(d, n) {
+    if (!n) { $("#where").innerHTML = '<p class="empty">No students yet. They appear as soon as they sign in.</p>'; return; }
+    var hereNow = {};
+    d.students.forEach(function (s) { if (s.cur) hereNow[s.cur] = (hereNow[s.cur] || 0) + 1; });
+
+    $("#where").innerHTML = d.steps.map(function (id) {
+      var done = d.students.filter(function (s) { return s.steps[id]; }).length;
+      var pct = done / n * 100;
+      var here = hereNow[id] || 0;
+      var tip = (TITLES[id] || id) + ": " + done + " of " + n + " finished (" + Math.round(pct) + "%)" +
+        (here ? ", " + here + " working on it now" : "");
+      return '<div class="row"><span class="lab">' + label(id) + "</span>" +
+        '<div class="track" data-tip="' + esc(tip) + '"><span class="fill" style="width:' + pct + '%"></span></div>' +
+        '<span class="val">' + done + (here ? ' <span class="here">' + here + " here</span>" : "") + "</span></div>";
+    }).join("");
+  }
+
+  function renderHelp(d) {
+    var slow = d.students.filter(function (s) {
+      if (s.finished || s.onStepMin === null) return false;
+      var plan = PLANNED[s.cur] || 3;
+      return s.onStepMin > Math.max(6, plan * 1.5);
+    }).sort(function (a, b) {
+      return (b.onStepMin / (PLANNED[b.cur] || 3)) - (a.onStepMin / (PLANNED[a.cur] || 3));
+    });
+
+    if (!slow.length) { $("#help").innerHTML = '<p class="empty">Nobody is running long right now.</p>'; return; }
+    $("#help").innerHTML = '<ul class="help-list">' + slow.map(function (s) {
+      var plan = PLANNED[s.cur];
+      return "<li><span><b>" + esc(s.name) + '</b> <span class="where">on ' + esc(TITLES[s.cur] || s.cur) + "</span></span>" +
+        '<span class="over">' + Math.round(s.onStepMin) + " min" + (plan ? " / " + plan + " planned" : "") + "</span></li>";
+    }).join("") + "</ul>";
+  }
+
+  function renderTime(d) {
+    var rows = d.steps.map(function (id) {
+      return { id: id, med: median(d.durations[id]), n: d.durations[id].length, plan: PLANNED[id] || 0 };
+    });
+    if (!rows.some(function (r) { return r.n; })) {
+      $("#time").innerHTML = '<p class="empty">No finished steps yet. Times appear as students complete steps.</p>';
+      return;
+    }
+
+    var max = Math.max.apply(null, rows.map(function (r) { return Math.max(r.med || 0, r.plan); }));
+    var step = max > 40 ? 10 : 5;
+    var top = Math.max(step, Math.ceil(max / step) * step);
+
+    var html = rows.map(function (r) {
+      var w = r.med !== null ? r.med / top * 100 : 0;
+      var tip = (TITLES[r.id] || r.id) + ": " + (r.med !== null ? "median " + r.med.toFixed(1) + " min from " + r.n + " student" + (r.n === 1 ? "" : "s") : "no data yet") +
+        (r.plan ? ", planned " + r.plan + " min" : "");
+      return '<div class="row"><span class="lab">' + label(r.id) + "</span>" +
+        '<div class="track" data-tip="' + esc(tip) + '">' +
+        (r.med !== null ? '<span class="fill" style="width:' + w + '%"></span>' : "") +
+        (r.plan ? '<span class="plan" style="left:' + (r.plan / top * 100) + '%"></span>' : "") +
+        '</div><span class="val">' + (r.med !== null ? r.med.toFixed(1) + " min" : "none") + "</span></div>";
+    }).join("");
+
+    var ticks = "";
+    for (var t = 0; t <= top; t += step) ticks += '<span style="left:' + (t / top * 100) + '%">' + t + "</span>";
+    html += '<div class="axis" aria-hidden="true"><span></span><div class="ticks">' + ticks + '</div><span>minutes</span></div>';
+    $("#time").innerHTML = html;
+  }
+
+  function renderMix(d) {
+    var any = d.students.some(function (s) { return Object.keys(s.levels).length; });
+    if (!any) { $("#mix").innerHTML = '<p class="empty">No steps finished yet.</p>'; return; }
+
+    $("#mix").innerHTML = d.steps.map(function (id) {
+      var took = d.students.filter(function (s) { return s.steps[id]; });
+      var counts = { beginner: 0, intermediate: 0, advanced: 0 };
+      took.forEach(function (s) { counts[s.levels[id] || "beginner"]++; });
+      var beyond = counts.intermediate + counts.advanced;
+      var pct = took.length ? beyond / took.length * 100 : 0;
+      var tip = (TITLES[id] || id) + ": " + counts.beginner + " Beginner, " + counts.intermediate +
+        " Intermediate, " + counts.advanced + " Advanced";
+      return '<div class="row"><span class="lab">' + label(id) + "</span>" +
+        '<div class="track" data-tip="' + esc(tip) + '"><span class="fill" style="width:' + pct + '%"></span></div>' +
+        '<span class="val">' + (took.length ? counts.beginner + "/" + counts.intermediate + "/" + counts.advanced : "") + "</span></div>";
+    }).join("") + '<p class="sub" style="padding-top:8px">Counts read Beginner / Intermediate / Advanced.</p>';
+  }
+
+  function renderRatings(ratings, avg) {
+    $("#rating-sub").textContent = ratings.length
+      ? "Average " + avg.toFixed(1) + " out of 5 from " + ratings.length + " rating" + (ratings.length === 1 ? "" : "s") + "."
+      : "No ratings yet. Students rate the workshop on the finish screen.";
+    if (!ratings.length) { $("#rating").innerHTML = ""; return; }
+    var counts = [0, 0, 0, 0, 0, 0];
+    ratings.forEach(function (r) { counts[r]++; });
+    var max = Math.max.apply(null, counts);
+    $("#rating").innerHTML = [5, 4, 3, 2, 1].map(function (r) {
+      var tip = r + " star" + (r === 1 ? "" : "s") + " (" + WORDS[r] + "): " + counts[r] + " of " + ratings.length;
+      return '<div class="row"><span class="lab">' + "★".repeat(r) + " " + WORDS[r] + "</span>" +
+        '<div class="track" data-tip="' + esc(tip) + '"><span class="fill" style="width:' + (max ? counts[r] / max * 100 : 0) + '%"></span></div>' +
+        '<span class="val">' + counts[r] + "</span></div>";
+    }).join("");
+  }
+
+  function renderFeedback(d) {
+    var list = data.feedback.slice().sort(function (a, b) { return String(b.at).localeCompare(String(a.at)); });
+    if (!list.length) { $("#feedback").innerHTML = '<p class="empty">No feedback yet.</p>'; return; }
+    $("#feedback").innerHTML = '<ul class="fb-list">' + list.map(function (f) {
+      var stars = "★".repeat(f.rating || 0) + "☆".repeat(5 - (f.rating || 0));
+      return '<li><span class="fb-stars" aria-label="' + (f.rating || 0) + ' out of 5">' + stars + "<em>" + esc(WORDS[f.rating] || "") + "</em></span>" +
+        (f.comment ? '<p class="fb-text">' + esc(f.comment) + "</p>" : '<p class="fb-text none">No comment</p>') +
+        '<span class="fb-who">' + esc(f.name) + " · " + esc(f.email) + " · " + ago(f.at, d.now) + "</span></li>";
+    }).join("") + "</ul>";
+  }
+
+  function renderStudents(d) {
+    var q = $("#filter").value.trim().toLowerCase();
+    var sort = $("#sort").value;
+    var rows = d.students.filter(function (s) {
+      return !q || s.name.toLowerCase().indexOf(q) >= 0 || String(s.email).toLowerCase().indexOf(q) >= 0;
+    });
+    rows.sort(function (a, b) {
+      if (sort === "name") return a.name.localeCompare(b.name);
+      if (sort === "active") return String(b.updatedAt).localeCompare(String(a.updatedAt));
+      return b.done - a.done || a.name.localeCompare(b.name);
+    });
+
+    if (!rows.length) {
+      $("#students").innerHTML = '<tr><td colspan="8" class="empty">' + (d.students.length ? "No students match that filter." : "No students yet.") + "</td></tr>";
+      return;
+    }
+
+    $("#students").innerHTML = rows.map(function (s) {
+      var pips = d.steps.map(function (id) {
+        return '<span class="pip' + (s.steps[id] ? " on" : "") + '" title="' + esc(TITLES[id] || id) + '"></span>';
+      }).join("");
+      return "<tr><td>" + esc(s.name) + '</td><td class="email">' + esc(s.email) + "</td>" +
+        "<td>" + esc(LEVEL_LABEL[s.level] || "Beginner") + "</td>" +
+        '<td class="num"><span class="pips" aria-hidden="true">' + pips + "</span>" + s.done + "/" + d.steps.length + "</td>" +
+        "<td>" + (s.finished ? '<span class="done-tag">✓ finished</span>' : esc(TITLES[s.cur] || s.cur)) + "</td>" +
+        '<td class="num">' + ago(s.joinedAt, d.now) + '</td><td class="num">' + ago(s.updatedAt, d.now) + "</td>" +
+        '<td class="num">' + (s.fb ? "★ " + s.fb.rating : "") + "</td></tr>";
+    }).join("");
+  }
+
+  $("#filter").addEventListener("input", function () { if (data) renderStudents(derive()); });
+  $("#sort").addEventListener("change", function () { if (data) renderStudents(derive()); });
+
+  /* ---------- tooltip on every bar ---------- */
+
+  var tip = $("#tip");
+  document.addEventListener("mousemove", function (e) {
+    var t = e.target.closest && e.target.closest("[data-tip]");
+    if (!t) { tip.hidden = true; return; }
+    tip.textContent = t.getAttribute("data-tip");
+    tip.hidden = false;
+    var x = Math.min(e.clientX + 14, innerWidth - tip.offsetWidth - 8);
+    var y = e.clientY + 16 + tip.offsetHeight > innerHeight ? e.clientY - tip.offsetHeight - 10 : e.clientY + 16;
+    tip.style.left = x + "px";
+    tip.style.top = y + "px";
+  });
+
+  /* ---------- CSV export ---------- */
+
+  $("#export").addEventListener("click", function () {
+    if (!data) return;
+    var d = derive();
+    var cell = function (v) { v = v == null ? "" : String(v); return /[",\n]/.test(v) ? '"' + v.replace(/"/g, '""') + '"' : v; };
+    var head = ["name", "email", "level", "steps_done", "total_steps", "current_step", "joined_at", "last_active", "rating", "comment"];
+    var lines = [head.join(",")].concat(d.students.map(function (s) {
+      return [s.name, s.email, s.level, s.done, d.steps.length, s.finished ? "finished" : (TITLES[s.cur] || s.cur),
+        s.joinedAt, s.updatedAt, s.fb ? s.fb.rating : "", s.fb ? s.fb.comment : ""].map(cell).join(",");
+    }));
+    var blob = new Blob([lines.join("\n") + "\n"], { type: "text/csv;charset=utf-8" });
+    var url = URL.createObjectURL(blob);
+    var a = document.createElement("a");
+    a.href = url;
+    a.download = "agents-outreach-team-" + room + ".csv";
+    document.body.appendChild(a);
+    a.click();
+    a.remove();
+    setTimeout(function () { URL.revokeObjectURL(url); }, 1000);
+  });
+
+  /* ---------- start ---------- */
+
+  if (key) load(true); else showGate("");
+})();
+</script>
+</body>
+</html>
