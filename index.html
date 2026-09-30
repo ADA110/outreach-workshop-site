@@ -2258,6 +2258,10 @@
           <div class="files" data-files="base"></div>
           <p>Now read <code>CLAUDE.md</code> end to end. It is short, and every agent you are about to build works from it. If you are not sure how to open a file yet, paste this:</p>
           <div class="cmd">Open CLAUDE.md and show me the whole file.</div>
+          <div class="note">
+            <span class="note-label">You won't see .claude in Finder</span>
+            <p>Folders whose name starts with a dot are hidden by your file browser, so <code>.claude</code> is there but invisible. Ask Claude when you want to look inside it: <em>List everything in .claude/ and show me settings.json.</em></p>
+          </div>
           <p>One piece of shorthand before you do: <code>&lt;slug&gt;</code> means the company name in lowercase with hyphens, so Stripe becomes <code>stripe</code> and Acme Robotics becomes <code>acme-robotics</code>. Every run gets its own folder named that way.</p>
         </div>
 
@@ -2270,7 +2274,8 @@
             <li>The subject line never contains the company name.</li>
             <li>If the brief has fewer than three facts, ask a question instead of pitching.</li>
           </ul>
-          <p>Then write down which agent your rule constrains, and how you would know it was obeyed. You are checking that prediction in Round 1, so be specific about what you expect to see in the files.</p>
+          <p>Then write down which agent your rule constrains, and how you would know it was obeyed. You are checking that prediction in Round 1, so be specific about what you expect to see in the files. Keep it somewhere you will find it again:</p>
+          <div class="cmd">Append this to notes/predictions.md, creating the file if it does not exist: [my rule, which agent I think it constrains, and what a violation would look like in the file].</div>
           <p>Pick a rule you expect the pipeline to break at least sometimes. A rule about something a 110-word email was never going to contain comes back obeyed and teaches you nothing. If you cannot say what a violation would look like in the file, pick a different rule.</p>
           <p>The mechanism, so you are predicting rather than guessing: subagents inherit this file the same way your main session does, so a rule you put here reaches all four of them. That is what makes it a rulebook rather than a note to yourself.</p>
         </div>
@@ -2278,7 +2283,7 @@
         <div class="task" data-level="advanced">
           <p>Take the permissions file as given, then write the rulebook yourself.</p>
           <div class="files" data-files="settings"></div>
-          <p>Write <code>CLAUDE.md</code> without looking at ours. It has to carry three things: the org chart of who reads and writes what, the handoff rules, and the hard rules that hold whatever an agent's own prompt says.</p>
+          <p>Write <code>CLAUDE.md</code> without looking at ours. It has to carry three things: the org chart of who reads and writes what, the handoff rules, and the hard rules you want to hold across every agent. Whether they actually hold against an agent's own prompt is the experiment below, and the answer is less comfortable than the spec sounds.</p>
           <p>Then test it rather than admiring it. Write down one rule an agent could obey while still breaking the pipeline, and one the manager could obey while still doing the Editor's job for it. If you cannot find either, your rules are too vague to constrain anything, and that is worth more than a clean diff against ours.</p>
           <div class="note">
             <span class="note-label">That card overwrites your file</span>
@@ -2288,10 +2293,22 @@
             <summary>Compare with ours once yours exists</summary>
             <div class="files" data-files="claude-md"></div>
           </details>
-          <p>Then settle a question the file cannot answer on its own: <strong>when the rulebook and an agent's own prompt disagree, which one wins?</strong> Find out rather than guessing. You have not written the Editor yet, so note now that it will cap the email at 120 words, and add a line to <code>CLAUDE.md</code> that cannot be satisfied alongside that, such as a floor of 200 words. Then see which number comes out the other end in Round 1. Pick a contradiction with no middle ground: 60 against 120 produces a 90-word email that arguably obeys both, and then you have measured nothing.</p>
+          <p>Then settle a question the file cannot answer on its own: <strong>when the rulebook and an agent's own prompt disagree, which one wins?</strong> Find out rather than guessing. You have not written the Editor yet, so note now that it will cap the email at 120 words, and add a line to <code>CLAUDE.md</code> that cannot be satisfied alongside that, such as a floor of 200 words. Then run it twice in Round 1 and see which number comes out each time. Agreement tells you something about tendency. Disagreement tells you the more useful thing, which is that none of this is guaranteed. Pick a contradiction with no middle ground: 60 against 120 produces a 90-word email that arguably obeys both, and then you have measured nothing.</p>
           <p>Then delete the line once Round 1 has answered the question. Leave it in and every round after this is measuring your planted conflict as well as whatever you meant to change.</p>
         </div>
 
+        <div data-level="intermediate">
+          <div class="note">
+            <span class="note-label">Why that allow list is shaped like that</span>
+            <p>Every rule in it is an <code>Edit(...)</code>, and none is a <code>Write(...)</code>, although the agents create files rather than editing them. That is deliberate: Claude Code checks file permissions against <code>Edit</code> and <code>Read</code> rules only, and a <code>Write(...)</code> path rule is accepted, never consulted, and warned about at startup. <code>Edit(runs/**)</code> is what lets an agent create <code>01-brief.md</code>. The <code>Bash</code> entries are there because making a run folder and listing it are the two shell commands this pipeline needs.</p>
+          </div>
+        </div>
+        <div data-level="advanced">
+          <div class="note">
+            <span class="note-label">One thing worth checking rather than assuming</span>
+            <p>Every rule in that file is an <code>Edit(...)</code> and none is a <code>Write(...)</code>, although the agents create files rather than editing them. Work out which of those two facts is the mistake before you read on. Claude Code checks file permissions against <code>Edit</code> and <code>Read</code> rules only; a <code>Write(...)</code> path rule is accepted, never consulted, and warned about at startup.</p>
+          </div>
+        </div>
         <div class="note">
           <span class="note-label">You'll be asked to approve each write</span>
           <p>Claude Code reads the permissions file the moment it exists, but you are creating it right now, so the first two writes still come to you. Approve them. Everything after that, the agent files, your own files and the run output, is covered by the allow list you just created.</p>
@@ -2350,7 +2367,7 @@
           <p>Now write <code>.claude/agents/editor.md</code> from this spec alone, without looking at ours. Write it by hand, or describe it to Claude and have it create the file.</p>
           <div class="note">
             <span class="note-label">The block between the two --- markers</span>
-            <p><code>name</code> has to match the filename. <code>description</code> is what your main session reads when it decides who to hand a job to, so write it for that reader rather than for yourself. <code>tools</code> is a comma-separated list, and leaving it out grants every tool. <code>model</code> and <code>color</code> are optional. If a value contains a colon, quote it.</p>
+            <p><code>name</code> is what you delegate to, and it is independent of the filename, so keep the two the same for your own sanity and remember that renaming the file changes nothing. <code>description</code> is what your main session reads when it decides who to hand a job to, so write it for that reader rather than for yourself. <code>tools</code> is a comma-separated list, and leaving it out grants every tool. <code>model</code> and <code>color</code> are optional. If a value contains a colon, quote it.</p>
           </div>
 
           <div class="spec">
@@ -2375,11 +2392,11 @@
         </div>
 
         <div class="task" data-level="advanced">
-          <p>Write all three agent files yourself, from the org chart above. No specs. For each one decide: which tools it gets, which paths it reads, what it writes, and what it must never do.</p>
+          <p>Write all three agent files yourself, from the org chart above. For each one decide: which tools it gets, which paths it reads, what it writes, and what it must never do.</p>
           <p>Write <code>model: sonnet</code> into all three even though the field is optional. Before you start you were told every agent here runs on Sonnet whatever your session is set to, and on this track that is only true if you put it there.</p>
           <div class="note">
             <span class="note-label">The block between the two --- markers</span>
-            <p><code>name</code> has to match the filename. <code>description</code> is what your main session reads when it decides who to hand a job to, so write it for that reader rather than for yourself. <code>tools</code> is a comma-separated list, and leaving it out grants every tool. <code>model</code> and <code>color</code> are optional. If a value contains a colon, quote it.</p>
+            <p><code>name</code> is what you delegate to, and it is independent of the filename, so keep the two the same for your own sanity and remember that renaming the file changes nothing. <code>description</code> is what your main session reads when it decides who to hand a job to, so write it for that reader rather than for yourself. <code>tools</code> is a comma-separated list, and leaving it out grants every tool. <code>model</code> and <code>color</code> are optional. If a value contains a colon, quote it.</p>
           </div>
 
           <div class="note">
@@ -2440,6 +2457,7 @@ and the output path runs/thin-test/02-draft.md</div>
         </header>
         <p class="lede"><strong>End this session and start a new one on the same <code>agents-outreach-team</code> folder.</strong> This step isn't optional.</p>
         <p>In the desktop app that means closing this session and opening a new one on the same folder from the Code tab. If you are not sure, quit the app and open it again on the folder.</p>
+        <p>Nothing you have built lives in the chat. It is all files on disk, so closing the session loses none of it.</p>
         <div class="note">
           <span class="note-label">Why the restart is required</span>
           <p>Claude Code watches <code>.claude/agents/</code> and picks up new or edited agents within seconds. The catch: it only watches folders that already existed when the session started. You created that folder a minute ago, inside a session that began before it existed, so nothing is watching it yet. Nothing will warn you either. Your main session will simply have no agents to hand work to.</p>
@@ -2525,6 +2543,13 @@ and the output path runs/thin-test/02-draft.md</div>
           <span class="note-label">Read it before you paste</span>
           <p>Open <em>Show the full prompt</em>. Notice what the manager never hands between agents: the contents of a file. It passes the company, the role, the date and the recipient's name, and everything else is a path. No agent is ever handed what another agent wrote, only where to find it, and that is what keeps each agent's context clean. You'll paste this same prompt again in Rounds 2 and 3.</p>
         </div>
+        <div class="note">
+          <span class="note-label">What to expect while it runs</span>
+          <p>Two to five minutes. The Researcher is the slow part, because it is doing real web searches, and long gaps with nothing on screen are normal. You will see three rows appear in the transcript, labelled <code>researcher</code>, <code>writer</code> and <code>editor</code>, each finishing with a single sentence.</p>
+          <p><strong>If Claude says it has no <code>researcher</code> subagent</strong>, the restart in Step 04 did not take. Go back and run the check prompt there.</p>
+          <p><strong>If the brief comes back with one or two facts</strong>, that is the Researcher being honest rather than inventing, and your email will be shorter because of it. Open <code>01-brief.md</code> and see what it could not verify.</p>
+          <p><strong>If nothing has happened for five minutes</strong>, paste: <em>Where are you in the pipeline, and which file are you waiting on?</em></p>
+        </div>
         <p>Watch the transcript while it runs. Each delegation appears as its own row labelled with the subagent's name: three agents, three separate contexts, three jobs.</p>
         <p>When it finishes, open the run's folder (<code>runs/stripe/</code> if your company is Stripe) and read all three files <strong>in order</strong>:</p>
         <ol class="list">
@@ -2540,15 +2565,25 @@ and the output path runs/thin-test/02-draft.md</div>
         </div>
         <div data-level="intermediate">
           <div class="note">
+            <span class="note-label">Before you open the files</span>
+            <p>Predict two things and write them down: which fact in <code>01-brief.md</code> the Writer will pick as its hook, and which fact will not survive into <code>03-final.md</code> at all. Then read the three files in order and see. The second one is the interesting prediction, because it is the Editor deciding what you do not get to say.</p>
+          </div>
+          <div class="note">
             <span class="note-label">The prediction you made in Step 02</span>
-            <p>You added a rule to <code>CLAUDE.md</code> and wrote down which agent it would constrain. Check it now. Subagents inherit the project's <code>CLAUDE.md</code> the same way your main session does, so your rule reached all three of them. Open the file your rule was aimed at and see whether it was obeyed. If it was not, the usual reason is that the rule and that agent's own prompt disagreed.</p>
+            <p>Open <code>notes/predictions.md</code> and read what you wrote at Step 02. Check it now. Subagents inherit the project's <code>CLAUDE.md</code> the same way your main session does, so your rule reached all three of them. Open the file your rule was aimed at and see whether it was obeyed. If it was not, the usual reason is that the rule and that agent's own prompt disagreed.</p>
             <p>There is a third outcome, and it is the most common one: the file contains nothing your rule could have applied to. Then your rule was not obeyed, it was never tested. Sharpen it and check again in Round 2.</p>
           </div>
         </div>
         <div data-level="advanced">
           <div class="note">
+            <span class="note-label">The contradiction you planted at Step 02</span>
+            <p>This is the run that answers it. Check the word count in <code>03-final.md</code> against the two rules you set against each other, run it once more to see whether it lands the same way twice, then go back and delete the line.</p>
+          </div>
+          <div class="note">
             <span class="note-label">Get a baseline before you start measuring</span>
             <p>Run <code>/usage</code> before and after this run and write both numbers down. It reports the session's cumulative tokens with a cost figure, and on a subscription its Attribution section breaks out how much went to subagents, which is where nearly all of it goes: your main session only sends three short delegations here and reads three one-sentence replies, and four once the Recruiter joins in Round 3.</p>
+            <p>Write the absolute number down somewhere outside the session, on paper or in a file. Usage totals reset when the session does, and Round 2's own box says most people on this track stop mid-round and finish at home. If you come back without it, take one plain run's reading as a fresh baseline instead.</p>
+            <p>If you are billed through an API key rather than a subscription there is no Attribution section. Record total tokens instead, and treat everything above your own three short delegations as the subagent share.</p>
             <p>Use <code>/usage</code> rather than <code>/context</code>. <code>/context</code> shows how full your current context window is, not what the run cost, and it cannot see inside a subagent at all. Rounds 3 and 4 ask you what an extra agent and a batch cost you, and this is the only untouched run you will have to compare against.</p>
           </div>
         </div>
@@ -2576,7 +2611,7 @@ and the output path runs/thin-test/02-draft.md</div>
           <p>Here or just past here on the Beginner track, and usually in the middle of this round on Intermediate and Advanced, which both ask for extra runs before you can read anything. That is the expected outcome, not a failure. Rounds 3 and 4 are the two worth finishing at home, and your progress is saved for when you do.</p>
         </div>
         <div class="note">
-          <span class="note-label">Your first run is safe</span>
+          <span class="note-label">Round 1's output is safe</span>
           <p>Every run writes to a fresh folder, <code>runs/stripe-2/</code> and so on, because the project never overwrites a previous run. Editing an agent takes effect without restarting, and so does adding a new one, now that <code>.claude/agents/</code> exists. Step 04 was the one restart you needed, and it was needed because the folder itself was new.</p>
         </div>
 
@@ -2595,8 +2630,11 @@ and the output path runs/thin-test/02-draft.md</div>
           <p>The new run lands in its own folder, <code>runs/&lt;company&gt;-2/</code>, and Round 1's folder is left alone. Read the two <code>03-final.md</code> files side by side. Same brief, same draft, one different Editor, so anything that moved is your edit.</p>
           <div class="note">
             <span class="note-label">If you edited the Writer or the Researcher instead</span>
-            <p>Carry forward only what sits above the agent you changed. For the Writer, copy the brief and run the writer and then the editor. For the Researcher there is nothing to carry, so run the whole pipeline again and expect a different brief, which is the change you made.</p>
+            <p>Carry forward only what sits above the agent you changed.</p>
+            <p>If you edited the <strong>Writer</strong>, paste this instead of the prompt above:</p>
           </div>
+          <div class="cmd">Run the pipeline again for the same target, and change only the agent I edited. Copy the brief from my last run's folder into a new run folder, then delegate to the writer with that brief, me/background.md and a new 02-draft.md in the new folder, and then to the editor with that new draft, that brief, me/voice-samples.md and a new 03-final.md. Tell me both folder names when you are done.</div>
+          <p>If you edited the <strong>Researcher</strong>, there is nothing to carry forward. Paste the full run prompt again with the same target, and expect a different brief. That is your change.</p>
           <details class="bail">
             <summary>If Claude has lost the thread, or you restarted since Round 1</summary>
             <p>Paste the prompt in the dark box above on its own. It does not need the full run prompt: Claude still has <code>CLAUDE.md</code> and knows the agents.</p>
@@ -2605,13 +2643,15 @@ and the output path runs/thin-test/02-draft.md</div>
         </div>
 
         <div class="task" data-level="intermediate">
-          <p>Same edit, but commit to a prediction first.</p>
+          <p>Pick your own edit, and commit to a prediction before you run it.</p>
           <div class="note">
             <span class="note-label">Get your noise floor first</span>
             <p>Run the same target twice with nothing changed, reusing the brief both times. The difference between those two finals is what this pipeline does on its own, before you touch anything. Any change smaller than that is not your edit, it is the weather.</p>
           </div>
-          <div class="cmd">Run the pipeline again for the same target, but do not research again. Copy the brief from my last run's folder into a new run folder, then carry on from the writer onwards, skipping the researcher. Name the new folder the way the run prompt does, with a -2 or -3 suffix, and tell me which folder you used.</div>
-          <p>Paste that twice. You now have two folders that differ by nothing at all, and that difference is your noise floor.</p>
+          <div class="cmd">Run the pipeline again for the same target, but do not research and do not redraft. Copy the brief and the draft from my last run's folder into a new run folder, then delegate to the editor alone: give it that draft, that brief, me/voice-samples.md, and a new 03-final.md in the same folder. Name the folder the way the run prompt does, with a -2 or -3 suffix, and tell me which folder you used.</div>
+          <p>Paste that twice. You now have two folders that differ by nothing at all: same brief, same draft, same Editor. Look at the difference before you change anything:</p>
+          <div class="cmd">Show me the differences between the 03-final.md files in the last two run folders, and tell me which folders you compared.</div>
+          <p>That is your noise floor. Two identical runs, and it is probably still several lines. Hold that number in your head when you read the next diff.</p>
           <div class="note">
             <span class="note-label">Then pick an edit big enough to beat it</span>
             <p>A rule about the shape of the output, like the length of the subject line or a word the Editor may not use, is checkable against what you just saw. A change to tone or formality is not: every line will move, and you will not be able to tell your edit from the weather.</p>
@@ -2620,7 +2660,7 @@ and the output path runs/thin-test/02-draft.md</div>
           <div class="cmd">Open .claude/agents/editor.md and show me the file. Then make one change: [describe your change in one sentence]. Change nothing else, keep the block between the two --- markers exactly as it is.</div>
           <p>Before you run anything, write down two predictions where you can check them later:</p>
           <ul>
-            <li>Which of the other agents' output will change, and which will not.</li>
+            <li>Whether anything outside the part you touched moves at all. You changed one rule; the Editor rewrites the whole email every time.</li>
             <li>One specific phrase you expect to appear or disappear in the final email.</li>
           </ul>
           <p>Now run it once more, exactly the way you ran the two baselines. Same brief, same target, one agent changed:</p>
@@ -2634,9 +2674,11 @@ and the output path runs/thin-test/02-draft.md</div>
         <div class="task" data-level="advanced">
           <p>"It reads better" is not a result. Run the comparison properly, with the input held still.</p>
           <ol class="list">
-            <li><strong>Fix the input, all of it.</strong> Reuse Round 1's brief, and run the Writer exactly once over it and keep that one <code>02-draft.md</code>. The Editor is the variable. Re-running the Writer puts a fresh source of noise directly upstream of the thing you are measuring, which is the same mistake as re-researching, one step down.</li>
-            <li><strong>Make two Editors.</strong> Copy your current one to <code>editor-a.md</code>, then write <code>editor-b.md</code> with exactly one deliberate difference. One, not three. Avoid making that difference a word limit: judges reward length on their own, so you would be measuring your judge rather than your Editor. Change the <code>name:</code> line in each copy to match its new filename, or you will have three agents called <code>editor</code>.</li>
-            <li><strong>Run each twice.</strong> Four Editor runs over that one draft. Two per version is the least that shows you how noisy the pipeline is on its own.</li>
+            <li><strong>Fix the input, all of it.</strong> Reuse Round 1's brief <em>and</em> Round 1's draft. You already have exactly one of each, written from that brief. The Editor is the variable, and running the Writer again would put a fresh source of noise directly upstream of the thing you are measuring, which is the same mistake as re-researching, one step down.</li>
+            <li><strong>Make two Editors.</strong> Copy your current one to <code>editor-a.md</code>, then write <code>editor-b.md</code> with exactly one deliberate difference. One, not three. Avoid making that difference a word limit: judges reward length on their own, so you would be measuring your judge rather than your Editor. Pick something the rubric can see, too. It scores hook specificity, voice match and ask clarity, so a change to structure or ordering scores identically in both arms and measures nothing. If your change is not one of those three things, add a fourth dimension to the rubric before you run. Change both the <code>name:</code> and the <code>description:</code> line in each copy. The description is what the manager routes on, so two agents describing themselves identically is the one bug that will quietly ruin this comparison.</li>
+            <li><strong>Run each twice.</strong> Four Editor runs over that one draft. Two per version is the least that shows you how noisy the pipeline is on its own. One delegation per run, like this one:
+              <div class="cmd">Delegate to the editor-a subagent. Give it only these paths: runs/&lt;slug&gt;/02-draft.md, runs/&lt;slug&gt;/01-brief.md, me/voice-samples.md, and the output path runs/&lt;slug&gt;/03-final-a1.md. Do not paste any file contents.</div>
+            </li>
             <li><strong>Judge somewhere that has not watched you work.</strong> Label the four finals X1, X2, Y1, Y2, then hand the judging to a fresh session or to a subagent that gets the four finals, the brief and your voice samples, and nothing about how any of them were made. Relabelling hides nothing from the session that just watched you write <code>editor-b.md</code>.</li>
             <li><strong>Compare.</strong> Lay the twelve scores out in a table. Look at the spread <em>within</em> each version before you look at the gap <em>between</em> them.</li>
           </ol>
@@ -2647,10 +2689,15 @@ samples. 3 means plausible but generic. 1 means it contradicts the brief
 or reads like a different person. Give one sentence of evidence per
 score, then the three numbers. Comment on nothing else.</div>
           <div class="note">
+            <span class="note-label">One catch on the blinding</span>
+            <p>A fresh session in this project still loads <code>CLAUDE.md</code>, which describes the Editor, its word cap and its voice-matching job. Your judge is less naive than it looks. Either judge from a folder with no <code>CLAUDE.md</code> in it, or tell the judge to ignore the project instructions and use only the three things you handed it.</p>
+          </div>
+          <div class="note">
             <span class="note-label">Why the judge reads two files first</span>
             <p>Handed the email alone, a judge cannot check a hook against anything, so it scores how specific the email <em>sounds</em>. That is the same failure your Writer has when the brief is thin, one level up. A rubric without the source material measures fluency and calls it accuracy.</p>
           </div>
-          <p>Then answer the only question that matters: is the gap between A and B bigger than the spread within A?</p>
+          <p>Then answer the only question that matters: is the gap between A and B bigger than the spread <em>within</em> each of them? If the tighter arm is the one you happen to call A, comparing against it alone will flatter your result.</p>
+          <p>Take a <code>/usage</code> reading now and write it down too. You have just spent six runs on this comparison, so Round 3 compares against this number rather than against Round 1.</p>
           <details class="bail">
             <p>Short on time: one run per version, and treat the result as a hint rather than a finding. Say which it is when you talk about it.</p>
           </details>
@@ -2689,6 +2736,7 @@ score, then the three numbers. Comment on nothing else.</div>
         <div class="note">
           <span class="note-label">No restart this time</span>
           <p><code>.claude/agents/</code> already exists, so Claude Code notices <code>recruiter.md</code> within seconds of you creating it. Step 04 needed a restart because the folder itself was new. That is the difference it was teaching you, and you are on the other side of it now.</p>
+          <p>If Claude does say it cannot find a <code>recruiter</code> subagent, run the check prompt from Step 04. If the recruiter is missing from that list, end the session and start a new one, and it will be there.</p>
         </div>
         <div class="task" data-level="beginner">
           <div class="files" data-files="recruiter"></div>
@@ -2717,7 +2765,8 @@ score, then the three numbers. Comment on nothing else.</div>
             <summary>Ours, to compare against or fall back on</summary>
             <div class="files" data-files="recruiter"></div>
           </details>
-          <p>Then run the same target.</p>
+          <p>Then run the same target again, reusing what you already have so the Recruiter is the only new thing in the run:</p>
+          <div class="cmd">Run the pipeline again for the same target, reusing the brief and the draft from my last run's folder in a new run folder. Run the editor, then the recruiter, and the revision loop if the score comes in under 8. Tell me the folder name when you are done.</div>
           <div class="files" data-run></div>
         </div>
 
@@ -2729,7 +2778,7 @@ score, then the three numbers. Comment on nothing else.</div>
             <li>Compare <code>03-final.md</code> with <code>03-final-v2.md</code> and write down exactly what the Writer changed to raise its score.</li>
             <li>Now change one thing in the rubric that you would not want optimised, such as rewarding detail, and run again.</li>
           </ol>
-          <p>Run <code>/usage</code> again when you are done. The Recruiter is one more agent, and a run where the loop fires is three more delegations. Write down what the fourth agent cost you as a share of your Round 1 baseline, then decide whether one point of score is worth it.</p>
+          <p>Run <code>/usage</code> again when you are done. The Recruiter is one more agent, and a run where the loop fires is three more delegations. Write down what the fourth agent cost you as a share of your reading from the end of Round 2, then decide whether one point of score is worth it.</p>
           <p>You are watching for the moment the email gets worse while the score goes up. One place to look first: the Recruiter reads the final and the brief, and never reads <code>me/background.md</code>. So a revision that invents a claim about <em>you</em> to raise its score is the one kind of damage nothing in the pipeline can see.</p>
           <div class="files" data-run></div>
           <details class="bail">
@@ -2744,6 +2793,10 @@ score, then the three numbers. Comment on nothing else.</div>
           <li><code>04-review-v2.md</code>: the score after one revision</li>
         </ol>
         <div class="note">
+          <span class="note-label">Ending on "would reply: no" is a normal result</span>
+          <p>One loop is all the pipeline gets, even if the second score is still under 8. Finishing at 6 or 7 is not a broken run, and what the loop could not fix is the interesting part.</p>
+        </div>
+        <div class="note">
           <span class="note-label">No second file?</span>
           <p>Then your first score was 8 or higher and the loop never fired, which is the one case this round has nothing to show you. That is a good outcome, not a mistake. To see the loop anyway, run it once more with Person left blank: the missing name usually costs enough to trigger it.</p>
         </div>
@@ -2753,7 +2806,8 @@ score, then the three numbers. Comment on nothing else.</div>
         </div>
         <div class="note">
           <span class="note-label">Where the review actually goes</span>
-          <p>Back to the Writer, and only the Writer. So an objection about length, the subject line or the voice lands on the agent that does not own it, and the Editor never sees the review at all. Watch for a fix that appears in <code>02-draft-v2.md</code> and is gone again by <code>03-final-v2.md</code>, because the Editor's own rules cut it back. That is a routing problem rather than a bad revision, and it is the first thing you would change if this were your pipeline.</p>
+          <p>Back to the Writer, and only the Writer. So an objection about length, the subject line or the voice lands on the agent that does not own it, and the Editor never sees the review at all. Watch for a fix that appears in <code>02-draft-v2.md</code> and is gone again by <code>03-final-v2.md</code>, because the Editor's own rules cut it back.</p>
+          <p>The worst case is an objection about the facts. If the Recruiter says the hook is not specific enough, that belongs to the Researcher, and the Writer cannot fix it: no web access, and no way to send anything back a step. Watch for the same objection surviving the revision word for word. When it does, you have found the strongest argument for routing a review by whichever agent owns the problem.</p>
         </div>
         <div class="note">
           <span class="note-label">Notice what you didn't have to change</span>
@@ -2791,13 +2845,19 @@ score, then the three numbers. Comment on nothing else.</div>
         <p class="lede">Create the target list. It arrives with five examples in it, which you'll replace in a moment. The third column, the person, is optional: fill it in where you know who should receive the email, and leave the column off entirely where you don't, rather than leaving a trailing <code>|</code>.</p>
         <div class="files" data-files="targets"></div>
         <div class="task" data-level="beginner">
-          <p>Now replace the five example lines with five of your own, then paste the batch prompt. It's the run prompt's bigger sibling: the same pipeline, once for every line in <code>targets.md</code>:</p>
+          <p>Now replace the five example lines with five of your own:</p>
+          <div class="cmd">Open targets.md and show me it. Then replace the five example target lines with mine, one at a time, asking me for the company, the role, and the person if I know one. Leave the comment lines starting with # exactly as they are.</div>
+          <div class="note">
+            <span class="note-label">This is the expensive step</span>
+            <p>Five targets means five Researchers searching at once, then five writer, editor and reviewer chains in turn, with a revision loop wherever the score lands under 8. Expect ten to twenty minutes and a real bite out of your daily usage. If you are running low, cut <code>targets.md</code> to two lines: the lesson is the same shape at two as at five.</p>
+          </div>
+          <p>Then paste the batch prompt. It's the run prompt's bigger sibling: the same pipeline, once for every line in <code>targets.md</code>:</p>
           <div class="files" data-files="batch"></div>
           <p>Watch the shape of the run change. All five Researchers go at once, because none of them needs anything from the others. Everything after that runs in order per target, because each step reads the file the step before it wrote. The finals collect in <code>runs/batch-summary.md</code>.</p>
         </div>
 
         <div class="task" data-level="intermediate">
-          <p>Step 3 does one target at a time, start to finish. Rewrite it so the Writers fan out the way the Researchers do in step 2, and the Editors after them, while keeping the order <em>within</em> a single target: writer, then editor, then recruiter. The revision loop stays sequential.</p>
+          <p>Step 3 does one target at a time, start to finish. Rewrite it so the Writers fan out the way the Researchers do in step 2, and the Editors after them, while keeping writer before editor before recruiter for any one target, since each reads what the last one wrote. The revision loop stays sequential too.</p>
           <div class="files" data-files="batch"></div>
           <details class="bail">
             <summary>One way to write it, once you have tried</summary>
@@ -2810,7 +2870,7 @@ score, then the three numbers. Comment on nothing else.</div>
             <li>The Writer and the Editor for the same company.</li>
             <li>Two runs for the same company at once.</li>
           </ul>
-          <p>To run your version: copy the batch prompt, swap your step 3 in for theirs, and paste the result. If you would rather move on, run theirs as it stands and read the timing instead.</p>
+          <p>To run your version: copy the batch prompt, swap your step 3 in for theirs, and paste the result. If you would rather move on, run theirs as it stands and note the wall clock from the first delegation to the summary file, so you have something to compare a parallel version against later.</p>
           <p>Then look in <code>runs/</code>. You will not see the collision from this file, because no two lines share a company. To see it you would have to start two runs on the same company at once, in two sessions. That is the difference between a race you can reason about and one you can reproduce.</p>
           <div class="note">
             <span class="note-label">One thing before you write</span>
@@ -2821,7 +2881,9 @@ score, then the three numbers. Comment on nothing else.</div>
             <p class="ask-q">The last one is a trap, and the trap is ours.</p>
             <div class="answer">
               <div class="answer-text" aria-hidden="true" tabindex="-1">
-                <p><strong>Two runs for the same company at once is not safe</strong>, and the reason is in the prompt you have been pasting all day. Step 1 checks whether a folder exists and then creates it. Two runs that start together can both check before either creates, and both decide <code>runs/stripe/</code> is free.</p>
+                <p><strong>The first two are safe.</strong> Different companies mean different folders and nothing shared, so five Researchers or five Writers can run at once without touching each other's files.</p>
+                <p><strong>The third is not.</strong> The Editor would be reading a draft the Writer has not finished writing. Within one target the chain has to stay in order.</p>
+                <p><strong>And the fourth is the trap.</strong> Two runs for the same company at once is not safe, and the reason is in the prompt you have been pasting all day. Step 1 checks whether a folder exists and then creates it. Two runs that start together can both check before either creates, and both decide <code>runs/stripe/</code> is free.</p>
                 <p>The <code>-2</code> guard protects you from running the same target again <em>later</em>, not at the same time. Guards that read and then write are only safe when nothing else is running.</p>
               </div>
               <button type="button" class="answer-btn">Reveal an answer <small>write yours first</small></button>
@@ -2830,16 +2892,21 @@ score, then the three numbers. Comment on nothing else.</div>
         </div>
 
         <div class="task" data-level="advanced">
-          <p>Take it to a size where the simple version stops working. Put twenty targets in <code>targets.md</code>, including two different roles at the same company.</p>
+          <p>Take it to a size where the simple version stops working. Put twenty targets in <code>targets.md</code>, with at least four companies carrying two or three roles each, so ten or more of the twenty share a brief. One duplicate company saves one brief out of twenty, which is smaller than the run-to-run noise, and you would not be able to see the thing this round is about.</p>
+          <div class="note">
+            <span class="note-label">How long this is</span>
+            <p>Twenty targets is sixty to a hundred subagent calls, and the exercise asks you to start the batch twice. Budget an hour and a half of mostly waiting, and start it when you have something else to do. Stopping the first pass early is the point, so you do not need to let it finish.</p>
+          </div>
           <p>Before you run, edit the batch prompt so that it:</p>
           <ol class="list">
             <li>makes the slug from the company <em>and</em> the role, so <code>Linear | Product Manager</code> and <code>Linear | Product Engineer</code> do not land in the same folder. Step 1 slugs the company alone, which is fine for one target and silently wrong for twenty,</li>
             <li>keeps the brief at the company level and the drafts at the target level, so two roles at one company share one brief instead of researching it twice,</li>
-            <li>skips any target whose final already exists, so an interrupted run can pick up where it stopped. Two rules defeat this on their own: step 1's <code>-2</code> suffix, since a second run finds every folder occupied and starts fresh ones where no final exists, and <code>CLAUDE.md</code>'s "Never overwrite a previous run", which every agent still reads. Both have to go, and the batch prompt still says "Follow CLAUDE.md",</li>
+            <li>skips any target whose final already exists <em>and is not empty</em>, and writes the final last, so an interruption part way through a write does not leave a truncated file your resume happily skips. Three rules defeat resumability on their own: step 1's <code>-2</code> suffix, since a second run finds every folder occupied and starts fresh ones where no final exists; <code>CLAUDE.md</code>'s "Never overwrite a previous run"; and, once briefs move to the company level, <code>CLAUDE.md</code>'s "Every run lives in <code>runs/&lt;company-slug&gt;/</code>". All three have to bend, and the batch prompt still says "Follow CLAUDE.md",</li>
             <li>runs at most four Researchers at a time rather than all twenty.</li>
           </ol>
           <div class="files" data-files="batch"></div>
           <p>Run it, stop it halfway, then run it again and watch what it skips. Then record the wall clock and <code>/usage</code> for the batch, divide by twenty, and compare the per-target cost against your Round 1 baseline. Sharing one brief between two roles at the same company should show up as a number, so say how big it is.</p>
+          <p>Put the rules you bent back into <code>CLAUDE.md</code> when you are done, the same way you deleted the planted contradiction in Step 02. A rulebook amended for one batch and left that way is how a pipeline quietly stops protecting anything.</p>
           <p>One honest caveat on the throttle: there is no semaphore here. You are asking the manager to keep itself to four at a time, and it may not. Read the transcript and say whether it did.</p>
           <p>The second change is the one that pays, and the first is what makes it possible. The brief is the expensive part of a target, and two roles at one company can share it, but only once a folder name can tell those two targets apart.</p>
         </div>
@@ -2866,7 +2933,7 @@ score, then the three numbers. Comment on nothing else.</div>
           <span class="mono-label">Questions to sit with</span>
           <ol class="list">
             <li>Where would you <strong>split</strong> one of these agents in two, or <strong>merge</strong> two into one?</li>
-            <li>Which agent would you move to a cheaper model? Change it and run it again before you answer. To make the change, paste: <em>Open the agent file I name next and change the line <code>model: sonnet</code> to <code>model: haiku</code>. Change nothing else, then show me the line you changed.</em></li>
+            <li>Which agent would you move to a cheaper model? Change it and run it again before you answer. To make the change, paste: <em>Open <code>.claude/agents/[agent name].md</code> and change the line <code>model: sonnet</code> to <code>model: haiku</code>. Change nothing else, then show me the line you changed.</em></li>
             <li>You pasted the same run prompt over and over today. What would you want instead? And what would have to be true for the pipeline to run on its own?</li>
           </ol>
           <div class="answer">
@@ -3007,7 +3074,8 @@ An agent pipeline that turns a company and a role into one cold email. It exists
       "Edit(.claude/**)",
       "Edit(targets.md)",
       "Bash(mkdir:*)",
-      "Bash(ls:*)"
+      "Bash(ls:*)",
+      "Bash(cp:*)"
     ]
   }
 }
@@ -3063,6 +3131,7 @@ Rules:
 - Open with one specific hook drawn from a fact in the brief. Mention it the way a person would, not as a citation.
 - One sentence on why the candidate is relevant, taken from their background. No claims about the candidate that are not in the background file.
 - One ask: 15 minutes, with two concrete windows (for example "Tuesday or Thursday afternoon").
+- Sign off with the name in the background file. If there is none, sign off with nothing after the closing line.
 - If you were given a recipient's name, greet them by it. If you were not, open with `Hi,` and leave the name for the candidate to fill in before sending.
 - Every statement about the company must trace to the brief. If the brief is thin, write a shorter email. Never pad.
 - No flattery, no "I hope this finds you well", no "reaching out", no "leverage", no "passionate".
@@ -3091,7 +3160,7 @@ color: purple
 You are the Editor on a small outreach team. You will be given paths to the draft, the research brief it was built from, and samples of how the candidate actually writes (me/voice-samples.md), plus an output path. Read all three. You have no web access.
 
 Rewrite the draft so that it:
-- is under 120 words
+- is under 120 words, counting the body only: not the subject, the greeting, the sign-off or the editor's note
 - sounds like the voice samples: match their sentence length, formality, and sign-off
 - has a subject line of six words or fewer
 - makes no claim about the company that is not in the brief (strike anything unsupported; do not replace it with something new)
@@ -3138,11 +3207,12 @@ You are the manager. Follow CLAUDE.md.
 <script type="text/plain" data-id="bg-template" data-path="me/background.md" data-verify="me/background.md" data-hint="A template. You fill in the three lines">
 # Your background
 
-Only the Writer reads this file. Three lines is enough.
+Only the Writer reads this file. Four lines is enough.
 
 - Before this:
 - Aiming for:
 - One proof point:
+- Sign off as:
 </script>
 
 <script type="text/plain" data-id="voice-template" data-path="me/voice-samples.md" data-verify="me/voice-samples.md" data-hint="A template. You paste in two real emails">
@@ -3198,11 +3268,12 @@ Notion | Product Manager
 <script type="text/plain" data-id="bg-sample" data-filename="background.md" data-hint="A filled-in example">
 # Your background
 
-Only the Writer reads this file. Three lines is enough.
+Only the Writer reads this file. Four lines is enough.
 
-- Before school: Two years as an operations analyst at a freight brokerage, mostly carrier pricing and vendor negotiation.
+- Before this: Two years as an operations analyst at a freight brokerage, mostly carrier pricing and vendor negotiation.
 - Aiming for: A product role at a company building infrastructure other people build on top of.
 - One proof point: Rebuilt our carrier-selection model and cut average cost per shipment 11% in a quarter.
+- Sign off as: Sam
 </script>
 
 <script type="text/plain" data-id="voice-sample" data-filename="voice-samples.md" data-hint="Two example emails">
