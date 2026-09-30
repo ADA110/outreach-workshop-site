@@ -2972,7 +2972,6 @@ score, then the three numbers. Comment on nothing else.</div>
             <li>Which agent would you move to a cheaper model? Change it and run it again before you answer. To make the change, replace the square brackets, including the brackets themselves, with the agent's name, then paste: <em>Open <code>.claude/agents/[agent name].md</code> and change the line <code>model: sonnet</code> to <code>model: haiku</code>. Change nothing else, then show me the line you changed.</em></li>
             <li>You pasted the same run prompt over and over today. What would you want instead? And what would have to be true for the pipeline to run on its own?</li>
           </ol>
-          <p class="ask-note">Mark this step complete and the finish screen has a few of these written up as things to try at home: running it over a batch of jobs and companies, letting the revision loop keep going until the score is good enough, and having it learn who you are from your CV rather than from three lines you typed.</p>
           <div class="answer">
             <div class="answer-text" aria-hidden="true" tabindex="-1">
               <p><strong>1. Split when one agent does two jobs badly; merge when a handoff adds cost without adding a check.</strong> If briefs contain mistakes, split the Researcher into a finder and a verifier. If the Editor barely changes the Writer's drafts, merging them saves a whole agent.</p>
@@ -2982,20 +2981,10 @@ score, then the three numbers. Comment on nothing else.</div>
             <button type="button" class="answer-btn">Reveal some answers <small>discuss first</small></button>
           </div>
         </div>
-      </section>
-
-      <section class="step finale" data-finale hidden>
-        <div class="postmark" aria-hidden="true"></div>
-        <header class="step-head">
-          <div class="step-meta"><span class="step-n">Workshop complete</span></div>
-          <h2 tabindex="-1">You built a four-agent pipeline from an empty folder.</h2>
-        </header>
-        <p class="lede">Here's everything you now know:</p>
-        <ul class="learned" id="learned"></ul>
 
         <section class="extras" aria-labelledby="ext-title">
-          <h3 id="ext-title">Where to take this next</h3>
-          <p>Each of these is a self-contained afternoon. Nothing here is required, and nothing here is harder than what you have already done.</p>
+          <h3 id="ext-title">Next steps to try at home</h3>
+          <p>None of this is part of the workshop. Each one is a self-contained afternoon, and nothing here is harder than what you have already done.</p>
 
           <details class="ext">
             <summary><b>Run it for several jobs, and for a batch of jobs and companies</b><span>Batching</span></summary>
@@ -3038,6 +3027,17 @@ score, then the three numbers. Comment on nothing else.</div>
             </div>
           </details>
         </section>
+
+      </section>
+
+      <section class="step finale" data-finale hidden>
+        <div class="postmark" aria-hidden="true"></div>
+        <header class="step-head">
+          <div class="step-meta"><span class="step-n">Workshop complete</span></div>
+          <h2 tabindex="-1">You built a four-agent pipeline from an empty folder.</h2>
+        </header>
+        <p class="lede">Here's everything you now know:</p>
+        <ul class="learned" id="learned"></ul>
 
         <section class="feedback" aria-labelledby="fb-title">
           <h3 id="fb-title">How was the workshop?</h3>
