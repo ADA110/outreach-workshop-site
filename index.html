@@ -1476,6 +1476,74 @@
 
   .spec ul { padding-left: 20px; gap: 6px; font-size: 14px; }
 
+  /* things to try afterwards, on the finish screen */
+
+  .extras {
+    border-top: 1px dashed var(--line-strong);
+    padding-top: 26px;
+    margin-top: 30px;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+  }
+
+  .extras h3 {
+    font-family: var(--f-display);
+    font-size: 21px;
+    font-weight: 700;
+    margin: 0;
+  }
+
+  .extras > p { margin: 0; color: var(--ink-2); }
+
+  .ext {
+    border: 1px solid var(--line-strong);
+    border-radius: 12px;
+    background: var(--ground);
+  }
+
+  .ext > summary {
+    display: flex;
+    align-items: baseline;
+    gap: 10px;
+    flex-wrap: wrap;
+    padding: 13px 16px;
+    cursor: pointer;
+    list-style: none;
+  }
+
+  .ext > summary::-webkit-details-marker { display: none; }
+  .ext > summary b { font-family: var(--f-display); font-size: 16px; font-weight: 700; }
+
+  .ext > summary span {
+    font-family: var(--f-mono);
+    font-size: 11px;
+    letter-spacing: .08em;
+    text-transform: uppercase;
+    color: var(--accent-ink);
+    background: var(--accent-soft);
+    border-radius: 99px;
+    padding: 2px 9px;
+  }
+
+  .ext > summary::after {
+    content: "\25B8";
+    margin-left: auto;
+    color: var(--muted);
+    font-size: 12px;
+  }
+
+  .ext[open] > summary::after { content: "\25BE"; }
+
+  .ext-body {
+    padding: 0 16px 16px;
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+  }
+
+  .ext-body p { margin: 0; }
+
   .bail {
     border: 1px dashed var(--line-strong);
     border-radius: 10px;
@@ -2188,7 +2256,6 @@
             <li class="ms"><span class="ph-when">Round 1</span><b>Run it</b><p>How your main session hands out work, and how agents pass it along through files.</p></li>
             <li><span class="ph-when">Round 2</span><b>Change it</b><p>How editing one agent changes every agent after it.</p></li>
             <li class="ms"><span class="ph-when">Round 3</span><b>Grow it</b><p>How to add an agent without rewriting the rest.</p></li>
-            <li><span class="ph-when">Round 4</span><b>Scale it</b><p>Which work can run in parallel, and which has to wait.</p></li>
             <li class="ms"><span class="ph-when">Debrief</span><b>Look back</b><p>Where you'd split or merge agents, and which ones could run on a cheaper model.</p></li>
           </ol>
           <p class="ms-legend"><svg class="cp-key" viewBox="0 0 16 16" aria-hidden="true" focusable="false"><circle cx="8" cy="8" r="6.6"/><path d="M8 4.4 8.94 6.71 11.42 6.89 9.52 8.49 10.12 10.91 8 9.6 5.88 10.91 6.48 8.49 4.58 6.89 7.06 6.71Z"/></svg><span>Checkpoint. Finishing one of these sets off confetti.</span></p>
@@ -2199,7 +2266,7 @@
             <h3 id="ov-leave">What you'll leave with</h3>
             <ul class="ticklist">
               <li>Your own <code>agents-outreach-team</code> folder: four agents you built and can keep using</li>
-              <li>A cold email draft for your top target, plus drafts for the rest of your list when you get to Round 4, ready for you to review and send</li>
+              <li>A cold email draft for your top target, ready for you to review and send</li>
               <li>A pattern you can reuse for other multi-step work</li>
             </ul>
           </div>
@@ -2853,92 +2920,6 @@ score, then the three numbers. Comment on nothing else.</div>
         </div>
       </section>
 
-      <section class="step" data-step="r4" data-label="Round 4" data-title="Round 4: Batch" hidden>
-        <header class="step-head">
-          <div class="step-meta"><span class="step-n">Round 4</span></div>
-          <h2 tabindex="-1">Batch</h2>
-        </header>
-        <p class="lede">Create the target list. It arrives with five examples in it, which you'll replace in a moment. The third column, the person, is optional: fill it in where you know who should receive the email, and leave the column off entirely where you don't, rather than leaving a trailing <code>|</code>.</p>
-        <div class="files" data-files="targets"></div>
-        <div class="task" data-level="beginner">
-          <p>Now replace the five example lines with five of your own:</p>
-          <div class="cmd">Open targets.md and show me it. Then replace the five example target lines with mine, one at a time, asking me for the company, the role, and the person if I know one. Leave the comment lines starting with # exactly as they are.</div>
-          <div class="note">
-            <span class="note-label">This is the expensive step</span>
-            <p>Five targets means five Researchers searching at once, then five writer, editor and reviewer chains in turn, with a revision loop wherever the score lands under 8. Expect ten to twenty minutes and a real bite out of your daily usage. If you are running low, cut <code>targets.md</code> to two lines: the lesson is the same shape at two as at five.</p>
-          </div>
-          <p>Then paste the batch prompt. It's the run prompt's bigger sibling: the same pipeline, once for every line in <code>targets.md</code>:</p>
-          <div class="files" data-files="batch"></div>
-          <p>Watch the shape of the run change. All five Researchers go at once, because none of them needs anything from the others. Everything after that runs in order per target, because each step reads the file the step before it wrote. The finals collect in <code>runs/batch-summary.md</code>.</p>
-        </div>
-
-        <div class="task" data-level="intermediate">
-          <p>Step 3 does one target at a time, start to finish. Rewrite it so the Writers fan out the way the Researchers do in step 2, and the Editors after them, while keeping writer before editor before recruiter for any one target, since each reads what the last one wrote. The revision loop stays sequential too.</p>
-          <div class="files" data-files="batch"></div>
-          <details class="bail">
-            <summary>One way to write it, once you have tried</summary>
-            <p>Fan out the Writers over every target at once and wait for all of them. Then the Editors the same way, and wait. Then the first Recruiter pass fans out too, because by then every final it reads is already written. Only the revision loop stays sequential, and only inside a target, since it rewrites the same chain it just read. Four waves and a tail, and the tail is the only part with a real data dependency.</p>
-          </details>
-          <p>Then decide, in writing, which of these are safe to run at the same time, and why:</p>
-          <ul>
-            <li>Five Researchers, five different companies.</li>
-            <li>Five Writers, five different companies.</li>
-            <li>The Writer and the Editor for the same company.</li>
-            <li>Two runs for the same company at once.</li>
-          </ul>
-          <p>To run your version: copy the batch prompt, swap your step 3 in for theirs, and paste the result. If you would rather move on, run theirs as it stands and note the wall clock from the first delegation to the summary file, so you have something to compare a parallel version against later.</p>
-          <p>Then look in <code>runs/</code>. You will not see the collision from this file, because no two lines share a company. To see it you would have to start two runs on the same company at once, in two sessions. That is the difference between a race you can reason about and one you can reproduce.</p>
-          <div class="note">
-            <span class="note-label">One thing before you write</span>
-            <p>A line ending in a bare <code>|</code> with nothing after it is the most natural way to type "no person", and it is also the thing "skip malformed lines" is most likely to throw away. Leave the column off entirely.</p>
-          </div>
-          <div class="ask">
-            <span class="mono-label">Once you have written your four</span>
-            <p class="ask-q">The last one is a trap, and the trap is ours.</p>
-            <div class="answer">
-              <div class="answer-text" aria-hidden="true" tabindex="-1">
-                <p><strong>The first two are safe.</strong> Different companies mean different folders and nothing shared, so five Researchers or five Writers can run at once without touching each other's files.</p>
-                <p><strong>The third is not.</strong> The Editor would be reading a draft the Writer has not finished writing. Within one target the chain has to stay in order.</p>
-                <p><strong>And the fourth is the trap.</strong> Two runs for the same company at once is not safe, and the reason is in the prompt you have been pasting all day. Step 1 checks whether a folder exists and then creates it. Two runs that start together can both check before either creates, and both decide <code>runs/stripe/</code> is free.</p>
-                <p>The <code>-2</code> guard protects you from running the same target again <em>later</em>, not at the same time. Guards that read and then write are only safe when nothing else is running.</p>
-              </div>
-              <button type="button" class="answer-btn">Reveal an answer <small>write yours first</small></button>
-            </div>
-          </div>
-        </div>
-
-        <div class="task" data-level="advanced">
-          <p>Take it to a size where the simple version stops working. Put twenty targets in <code>targets.md</code>, with at least four companies carrying two or three roles each, so ten or more of the twenty share a brief. One duplicate company saves one brief out of twenty, which is smaller than the run-to-run noise, and you would not be able to see the thing this round is about.</p>
-          <div class="note">
-            <span class="note-label">How long this is</span>
-            <p>Twenty targets is sixty to a hundred subagent calls, and the exercise asks you to start the batch twice. Budget an hour and a half of mostly waiting, and start it when you have something else to do. Stopping the first pass early is the point, so you do not need to let it finish.</p>
-          </div>
-          <p>Before you run, edit the batch prompt so that it:</p>
-          <ol class="list">
-            <li>makes the slug from the company <em>and</em> the role, so <code>Linear | Product Manager</code> and <code>Linear | Product Engineer</code> do not land in the same folder. Step 1 slugs the company alone, which is fine for one target and silently wrong for twenty,</li>
-            <li>keeps the brief at the company level and the drafts at the target level, so two roles at one company share one brief instead of researching it twice,</li>
-            <li>skips any target whose final already exists <em>and is not empty</em>, and writes the final last, so an interruption part way through a write does not leave a truncated file your resume happily skips. Three rules defeat resumability on their own: step 1's <code>-2</code> suffix, since a second run finds every folder occupied and starts fresh ones where no final exists; <code>CLAUDE.md</code>'s "Never overwrite a previous run"; and, once briefs move to the company level, <code>CLAUDE.md</code>'s "Every run lives in <code>runs/&lt;company-slug&gt;/</code>". All three have to bend, and the batch prompt still says "Follow CLAUDE.md",</li>
-            <li>runs at most four Researchers at a time rather than all twenty.</li>
-          </ol>
-          <div class="files" data-files="batch"></div>
-          <p>Run it, stop it halfway, then run it again and watch what it skips. Then record the wall clock and <code>/usage</code> for the batch, divide by twenty, and compare the per-target cost against your Round 1 baseline. Sharing one brief between two roles at the same company should show up as a number, so say how big it is.</p>
-          <p>Put the rules you bent back into <code>CLAUDE.md</code> when you are done, the same way you deleted the planted contradiction in Step 02. A rulebook amended for one batch and left that way is how a pipeline quietly stops protecting anything.</p>
-          <p>One honest caveat on the throttle: there is no semaphore here. You are asking the manager to keep itself to four at a time, and it may not. Read the transcript and say whether it did.</p>
-          <p>The second change is the one that pays, and the first is what makes it possible. The brief is the expensive part of a target, and two roles at one company can share it, but only once a folder name can tell those two targets apart.</p>
-        </div>
-        <div class="ask">
-          <span class="mono-label">Question to sit with</span>
-          <p class="ask-q">Which steps in this pipeline <em>have</em> to be sequential, and which are sequential only because you wrote them that way?</p>
-          <div class="answer">
-            <div class="answer-text" aria-hidden="true" tabindex="-1">
-              <p><strong>Within one target, the chain has to be sequential.</strong> The Writer needs the brief, the Editor needs the draft, the Recruiter needs the final. Each step reads the file the one before it wrote.</p>
-              <p><strong>Across targets, nothing depends on anything.</strong> Stripe's Writer never needs Figma's brief, so every target's Writer and Editor could run at the same time. They go one target at a time only because step 3 of the batch prompt says "for each target, in turn." The rule: sequential where there's a data dependency, parallel everywhere else.</p>
-            </div>
-            <button type="button" class="answer-btn">Reveal an answer <small>think it over first</small></button>
-          </div>
-        </div>
-      </section>
-
       <section class="step" data-step="debrief" data-label="Close" data-title="Debrief" hidden>
         <header class="step-head">
           <div class="step-meta"><span class="step-n">Close</span></div>
@@ -2971,6 +2952,23 @@ score, then the three numbers. Comment on nothing else.</div>
         </header>
         <p class="lede">Here's everything you now know:</p>
         <ul class="learned" id="learned"></ul>
+
+        <section class="extras" aria-labelledby="ext-title">
+          <h3 id="ext-title">Where to take this next</h3>
+          <p>Each of these is a self-contained afternoon. Nothing here is required, and nothing here is harder than what you have already done.</p>
+
+          <details class="ext">
+            <summary><b>Run it over a whole list at once</b><span>Batching</span></summary>
+            <div class="ext-body">
+              <p>One target at a time is the slow way. The same pipeline can take a list of companies and roles and work through all of them, with the Researchers running at the same time because none of them needs anything from the others, and everything after that in order per target, because each step reads the file the step before it wrote.</p>
+              <p>Start with a target list, one per line:</p>
+              <div class="files" data-files="targets"></div>
+              <p>Then hand the manager a prompt that loops over it instead of running once:</p>
+              <div class="files" data-files="batch"></div>
+              <p>Three things worth watching when you run it. Which parts actually happen in parallel and which quietly do not. What a run costs when it is twenty targets rather than one. And what happens when two targets share a company, since the folder name is built from the company alone.</p>
+            </div>
+          </details>
+        </section>
 
         <section class="feedback" aria-labelledby="fb-title">
           <h3 id="fb-title">How was the workshop?</h3>
@@ -3270,7 +3268,7 @@ KEEP: <the one thing that works>
 Then reply with one line: the score and where you wrote the review.
 </script>
 
-<script type="text/plain" data-id="targets" data-path="targets.md" data-verify="targets.md" data-hint="Round 4: swap in your own five">
+<script type="text/plain" data-id="targets" data-path="targets.md" data-verify="targets.md" data-hint="For the batch idea: one target per line">
 # One target per line, in the form: Company | Role | Person
 # The person is optional. Leave it off and the email opens with a blank "Hi,"
 # for you to fill in before you send it.
@@ -3325,7 +3323,7 @@ Sam
   "use strict";
 
   var STEPS = ["overview", "prep", "folder", "base", "agents", "restart",
-               "me", "r1", "r2", "r3", "r4", "debrief"];
+               "me", "r1", "r2", "r3", "debrief"];
   var KEY = "outreach-workshop-v3";
   var ROOM = (new URLSearchParams(location.search).get("room") || "default")
     .toLowerCase().replace(/[^a-z0-9-]/g, "").slice(0, 40) || "default";
@@ -3343,7 +3341,6 @@ Sam
     r1: "Now you know how agents hand work to each other through files.",
     r2: "Now you know how one prompt change ripples down the pipeline.",
     r3: "Now you know how to add an agent without touching the manager.",
-    r4: "Now you know which work can run in parallel, and which has to wait.",
     debrief: "You built a four-agent pipeline from an empty folder."
   };
   var START_MSG = "Twelve steps between you and a working agent team.";
