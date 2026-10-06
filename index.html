@@ -2337,6 +2337,11 @@
           <p><strong>Before you start, switch your main Claude Code session to Sonnet</strong>, using the model dropdown next to the send button, or by typing <code>/model</code> and choosing Sonnet from the list. Nothing in this workshop needs a bigger model, and a bigger one will eat through your usage limits well before the last round.</p>
           <p>The agents you are about to build run on Sonnet too. Every agent file carries the line <code>model: sonnet</code>, so the Researcher, the Writer, the Editor and the Recruiter all use it whatever your session is set to. Choosing Sonnet now means the whole pipeline, manager and agents alike, is running the same model.</p>
         </div>
+        <div class="note">
+          <span class="note-label">Set your permission mode to Accept Edits</span>
+          <p>It sits in the same row as the model picker. You are about to create around ten files, and this mode lets Claude write them without stopping to ask each time.</p>
+          <p>Auto mode is the one to avoid here. It will refuse to create the permissions file two steps from now, because that file decides what Claude is allowed to do, and a mode that approves on your behalf will not let Claude widen its own powers. That is the right call by Claude, and it leaves you stuck.</p>
+        </div>
         <p>There's nothing to download for this workshop. You'll build every file yourself, from this page.</p>
       </section>
 
@@ -2381,10 +2386,10 @@
             <li>The subject line never contains the company name.</li>
             <li>If the brief has fewer than three facts, ask a question instead of pitching.</li>
           </ul>
-          <p>Then write down which agent your rule constrains, and how you would know it was obeyed. You are checking that prediction in Step 06, so be specific about what you expect to see in the files. Keep it somewhere you will find it again:</p>
+          <p>Then write down which agent your rule constrains, and how you would know it was obeyed. You are checking that prediction on your first run, so be specific about what you expect to see in the files. Keep it somewhere you will find it again:</p>
           <div class="cmd">Append this to notes/predictions.md, creating the file if it does not exist: [my rule, which agent I think it constrains, and what a violation would look like in the file].</div>
           <p>Pick a rule you expect the pipeline to break at least sometimes. A rule about something a 110-word email was never going to contain comes back obeyed and teaches you nothing. If you cannot say what a violation would look like in the file, pick a different rule.</p>
-          <p>The mechanism, so you are predicting rather than guessing: subagents inherit this file the same way your main session does, so a rule you put here reaches all three of them, and the fourth one you add in Step 08. That is what makes it a rulebook rather than a note to yourself.</p>
+          <p>The mechanism, so you are predicting rather than guessing: subagents inherit this file the same way your main session does, so a rule you put here reaches all three of them, and the fourth one you add later. That is what makes it a rulebook rather than a note to yourself.</p>
         </div>
 
         <div class="task" data-level="advanced">
@@ -2400,8 +2405,6 @@
             <summary>Compare with ours once yours exists</summary>
             <div class="files" data-files="claude-md"></div>
           </details>
-          <p>Then settle a question the file cannot answer on its own: <strong>when the rulebook and an agent's own prompt disagree, which one wins?</strong> Find out rather than guessing. You have not written the Editor yet, so note now that it will cap the email at 120 words, and add a line to <code>CLAUDE.md</code> that cannot be satisfied alongside that, such as a floor of 200 words. Then run it twice in Step 06 and see which number comes out each time. Agreement tells you something about tendency. Disagreement tells you the more useful thing, which is that none of this is guaranteed. Pick a contradiction with no middle ground: 60 against 120 produces a 90-word email that arguably obeys both, and then you have measured nothing.</p>
-          <p>Then delete the line once Step 06 has answered the question. Leave it in and every round after this is measuring your planted conflict as well as whatever you meant to change.</p>
         </div>
 
         <div data-level="intermediate">
@@ -2417,23 +2420,16 @@
           </div>
         </div>
         <div class="note">
+          <span class="note-label">If Claude refuses to create the permissions file</span>
+          <p>If it tells you it cannot grant itself permissions, you are in auto mode. Switch to Accept Edits, in the same row as the model picker, and paste the prompt again.</p>
+        </div>
+        <div class="note">
           <span class="note-label">You'll be asked to approve each write</span>
           <p>Claude Code reads the permissions file the moment it exists, but you are creating it right now, so the first two writes still come to you. Approve them. Everything after that, the agent files, your own files and the run output, is covered by the allow list you just created.</p>
         </div>
         <div class="ask">
           <span class="mono-label">Read it before you move on</span>
           <p class="ask-q"><code>CLAUDE.md</code> is the org chart. It says agents hand work to each other through files. Find that line.</p>
-        </div>
-        <div class="ask" data-level="advanced">
-          <span class="mono-label">Question to sit with</span>
-          <p class="ask-q">Your rulebook and an agent prompt disagreed. Which won, and why can't you lean on that?</p>
-          <div class="answer">
-            <div class="answer-text" aria-hidden="true" tabindex="-1">
-              <p><strong>Usually the more specific instruction, and the one closest to the work.</strong> An agent's own prompt sits directly in its instructions, so a concrete rule there tends to beat a general one in the rulebook. That is a tendency rather than a guarantee: the model is reconciling two sets of instructions, and the same conflict can resolve differently on another run.</p>
-              <p>So never build a pipeline that depends on a conflict landing your way. Keep the rulebook for what is true everywhere, keep agent prompts for the job at hand, and when you find a contradiction, remove it rather than deciding which should rank higher.</p>
-            </div>
-            <button type="button" class="answer-btn">Reveal an answer <small>think it over first</small></button>
-          </div>
         </div>
       </section>
 
@@ -2508,12 +2504,32 @@
 
           <div class="note">
             <span class="note-label">Restart before the test below</span>
-            <p>You created <code>.claude/agents/</code> a few minutes ago, inside a session that started before it existed, so your agents are not loaded yet and the delegation below will quietly do nothing useful. Quit Claude completely and open it again first, the way Step 04 describes. Closing the window is not enough. Step 04 explains why, and this is the same thing one step early.</p>
+            <p>You created <code>.claude/agents/</code> a few minutes ago, inside a session that started before it existed, so your agents are not loaded yet and the delegation below will quietly do nothing useful. Claude Code watches that folder for new agents, but only folders that already existed when the session started, so yours is not being watched yet. Quit Claude completely and open it again before you run the test. Closing the window is not enough: it leaves Claude running behind it.</p>
           </div>
           <p>Then prove one of your decisions holds. Your Writer is supposed to be unable to invent facts about the company. Test it with a brief that gives it almost nothing:</p>
           <ol class="list">
-            <li>Create <code>runs/thin-test/01-brief.md</code> by hand: a company name, a role, and one vague fact. Nothing else.</li>
-            <li>Create <code>me/background.md</code> now rather than at Step 05, even as three throwaway lines. The Writer reads it, and this test needs it.</li>
+            <li>Create <code>runs/thin-test/01-brief.md</code>, a brief with the same sections as a real one and nothing in them worth using:
+              <div class="cmd">Create a file at runs/thin-test/01-brief.md with exactly these contents:
+
+COMPANY: Northwind Freight
+ROLE: Product Manager
+FACTS:
+1. The company has been growing.
+TARGET TEAMS:
+OPEN QUESTION:</div>
+              One fact with no date, no number and no source, and the two sections that usually give the Writer something to hold onto left empty. If your Writer invents, this is where it shows.</li>
+            <li>Create <code>me/background.md</code> too, since the Writer reads it. Throwaway lines are fine for a test:
+              <div class="cmd">Create a file at me/background.md with exactly these contents:
+
+# Your background
+
+Only the Writer reads this file. Four lines is enough.
+
+- Before this: Four years in supply chain analytics.
+- Aiming for: A product role.
+- One proof point: Cut planning cycle time by a third.
+- Sign off as: Alex</div>
+              You will replace it with your real one later, so do not spend time on it now.</li>
             <li>Run only the Writer against it, by pasting this:</li>
           </ol>
           <div class="cmd">Delegate to the writer subagent. Give it only these paths:
@@ -2662,12 +2678,13 @@ When you have it all, write both files, keep the headings exactly as they are, a
         <div class="files" data-run></div>
         <div class="note">
           <span class="note-label">Read it before you paste</span>
-          <p>Open <em>Show the full prompt</em>. Notice what the manager never hands between agents: the contents of a file. It passes the company, the role, the date and the recipient's name, and everything else is a path. No agent is ever handed what another agent wrote, only where to find it, and that is what keeps each agent's context clean. You'll paste this same prompt again in Step 08, and in Step 07 only if you edit the Researcher.</p>
+          <p>Open <em>Show the full prompt</em>. Notice what the manager never hands between agents: the contents of a file. It passes the company, the role, the date and the recipient's name, and everything else is a path. No agent is ever handed what another agent wrote, only where to find it, and that is what keeps each agent's context clean. You'll paste this same prompt again later.</p>
         </div>
         <div class="note">
           <span class="note-label">What to expect while it runs</span>
           <p>Two to five minutes. The Researcher is the slow part, because it is doing real web searches, and long gaps with nothing on screen are normal. You will see three rows appear in the transcript, labelled <code>researcher</code>, <code>writer</code> and <code>editor</code>, each finishing with a single sentence.</p>
           <p><strong>If Claude says it has no <code>researcher</code> subagent</strong>, the restart in Step 04 did not take. Go back and run the check prompt there.</p>
+          <p><strong>If Claude mentions it has no <code>recruiter</code> subagent</strong>, nothing is wrong. There is a fourth agent you add later, and the run prompt is written to work whether or not it exists yet.</p>
           <p><strong>If the brief comes back with one or two facts</strong>, that is the Researcher being honest rather than inventing, and your email will be shorter because of it. Open <code>01-brief.md</code> and see what it could not verify.</p>
           <p><strong>If nothing has happened for five minutes</strong>, paste: <em>Where are you in the pipeline, and which file are you waiting on?</em></p>
         </div>
@@ -2692,7 +2709,7 @@ When you have it all, write both files, keep the headings exactly as they are, a
           <div class="note">
             <span class="note-label">The prediction you made in Step 02</span>
             <p>Open <code>notes/predictions.md</code> and read what you wrote at Step 02. Check it now. Subagents inherit the project's <code>CLAUDE.md</code> the same way your main session does, so your rule reached all three of them. Open the file your rule was aimed at and see whether it was obeyed. If it was not, the usual reason is that the rule and that agent's own prompt disagreed.</p>
-            <p>There is a third outcome, and it is the most common one: the file contains nothing your rule could have applied to. Then your rule was not obeyed, it was never tested. Sharpen it and check again in Step 07.</p>
+            <p>There is a third outcome, and it is the most common one: the file contains nothing your rule could have applied to. Then your rule was not obeyed, it was never tested. Sharpen it and check it on your next run.</p>
           </div>
         </div>
         <div data-level="advanced">
@@ -2702,10 +2719,10 @@ When you have it all, write both files, keep the headings exactly as they are, a
           </div>
           <div class="note">
             <span class="note-label">Get a baseline before you start measuring</span>
-            <p>Run <code>/usage</code> before and after this run and write both numbers down. It reports the session's cumulative tokens with a cost figure, and on a subscription its Attribution section breaks out how much went to subagents, which is where nearly all of it goes: your main session only sends three short delegations here and reads three one-sentence replies, and four once the Recruiter joins in Step 08.</p>
-            <p>Write the absolute number down somewhere outside the session, on paper or in a file. Usage totals reset when the session does, and Step 07's own box says most people on this track stop mid-round and finish at home. If you come back without it, take one plain run's reading as a fresh baseline instead.</p>
+            <p>Run <code>/usage</code> before and after this run and write both numbers down. It reports the session's cumulative tokens with a cost figure, and on a subscription its Attribution section breaks out how much went to subagents, which is where nearly all of it goes: your main session only sends three short delegations here and reads three one-sentence replies, and four once you add the Recruiter.</p>
+            <p>Write the absolute number down somewhere outside the session, on paper or in a file. Usage totals reset when the session does, and this track is long enough that most people finish it over more than one sitting. If you come back without the number, take one plain run's reading as a fresh baseline instead.</p>
             <p>If you are billed through an API key rather than a subscription there is no Attribution section. Record total tokens instead, and treat everything above your own three short delegations as the subagent share.</p>
-            <p>Use <code>/usage</code> rather than <code>/context</code>. <code>/context</code> shows how full your current context window is, not what the run cost, and it cannot see inside a subagent at all. Step 08 asks you what the extra agent cost you, and this is the only untouched run you will have to compare against.</p>
+            <p>Use <code>/usage</code> rather than <code>/context</code>. <code>/context</code> shows how full your current context window is, not what the run cost, and it cannot see inside a subagent at all. When you add the Recruiter you will be asked what the extra agent cost you, and this is the only untouched run you will have to compare against.</p>
           </div>
         </div>
         <div class="ask">
@@ -2832,6 +2849,25 @@ score, then the three numbers. Comment on nothing else.</div>
               <p><strong>Too few samples.</strong> With two runs per version, the spread inside one version is often as wide as the gap between versions. The same prompt run twice gives different emails, and that noise is easy to read as an improvement.</p>
               <p><strong>The judge has its own taste.</strong> Models tend to reward length, hedging, and fluency. If B is simply longer, it can score higher while being worse to receive. Judging with the same model that wrote the email tilts it further, since it is scoring its own style.</p>
               <p>Others worth naming: the rubric might measure the wrong thing entirely, order effects change scores when emails are judged in sequence, and if the labels leak which version is which, the comparison is over before it starts. The cheap fixes are more samples, blinding, shuffling the order, and one human read to check the judge agrees with you at all.</p>
+            </div>
+            <button type="button" class="answer-btn">Reveal an answer <small>think it over first</small></button>
+          </div>
+        </div>
+        <div data-level="advanced">
+          <div class="note">
+            <span class="note-label">A second experiment, while the runs are this cheap</span>
+            <p>You have a rulebook and you have an Editor, and nothing has made them disagree yet. Open <code>.claude/agents/editor.md</code> and read the word cap you gave it. Then add a line to <code>CLAUDE.md</code> that cannot be satisfied alongside it, such as a floor well above that cap.</p>
+            <p>Pick a contradiction with no middle ground. A floor of 60 against a cap of 120 produces a 90-word email that arguably obeys both, and then you have measured nothing.</p>
+            <p>Run the Editor twice over the same draft and see which number comes out each time. Agreement tells you something about tendency. Disagreement tells you the more useful thing, which is that none of this is guaranteed. Then delete the line: leave it in and everything you measure afterwards is measuring your planted conflict too.</p>
+          </div>
+        </div>
+        <div class="ask" data-level="advanced">
+          <span class="mono-label">Question to sit with</span>
+          <p class="ask-q">Your rulebook and an agent prompt disagreed. Which won, and why can't you lean on that?</p>
+          <div class="answer">
+            <div class="answer-text" aria-hidden="true" tabindex="-1">
+              <p><strong>Usually the more specific instruction, and the one closest to the work.</strong> An agent's own prompt sits directly in its instructions, so a concrete rule there tends to beat a general one in the rulebook. That is a tendency rather than a guarantee: the model is reconciling two sets of instructions, and the same conflict can resolve differently on another run.</p>
+              <p>So never build a pipeline that depends on a conflict landing your way. Keep the rulebook for what is true everywhere, keep agent prompts for the job at hand, and when you find a contradiction, remove it rather than deciding which should rank higher.</p>
             </div>
             <button type="button" class="answer-btn">Reveal an answer <small>think it over first</small></button>
           </div>
@@ -3280,7 +3316,7 @@ You are the manager. Follow CLAUDE.md. Do the steps in order and wait for each s
 2. Delegate to the `researcher` subagent. Give it: the company, the role, today's date, and the output path `runs/<slug>/01-brief.md`.
 3. Delegate to the `writer` subagent. Give it only paths: `runs/<slug>/01-brief.md`, `me/background.md`, and the output path `runs/<slug>/02-draft.md`, plus the recipient's name if the target had one. Do not paste the brief into the delegation.
 4. Delegate to the `editor` subagent. Give it only paths: `runs/<slug>/02-draft.md`, `runs/<slug>/01-brief.md`, `me/voice-samples.md`, and the output path `runs/<slug>/03-final.md`.
-5. Check whether `.claude/agents/recruiter.md` exists. If it does not, skip to step 7.
+5. Check whether `.claude/agents/recruiter.md` exists. If it does not, go straight to step 7 without mentioning it.
 6. Delegate to the `recruiter` subagent with `runs/<slug>/03-final.md`, `runs/<slug>/01-brief.md`, and the output path `runs/<slug>/04-review.md`. Read the SCORE line from that file. If the score is under 8, run one revision loop: the writer again (same inputs plus `runs/<slug>/04-review.md`, output `runs/<slug>/02-draft-v2.md`), then the editor (using `02-draft-v2.md`, output `03-final-v2.md`), then the recruiter (using `03-final-v2.md`, output `04-review-v2.md`). One loop only, even if the second score is still under 8.
 7. Read the latest final file and print the email in the chat, then list the files in `runs/<slug>/` on one line. If there were two scores, show both. Do not edit the email yourself and do not send anything.
 </script>
