@@ -30,9 +30,8 @@
     --ag-writer: #2F6B4A;
     --ag-editor: #6B4A8C;
     --ag-recruiter: #9B3B2E;
-    --trk-b: #12805A;
-    --trk-i: #A8601A;
-    --trk-a: #7B4A99;
+    --trk-base: #12805A;
+    --trk-chal: #A8601A;
     --map-paper: #F0E4C8;
     --map-ink: #33281A;
     --map-ink-2: #6B5940;
@@ -936,17 +935,13 @@
   .fork .dot { fill: var(--ground); stroke: var(--line-strong); stroke-width: 1.6; }
   .fork .tick { fill: none; stroke: var(--ground); stroke-width: 1.9; stroke-linecap: round; stroke-linejoin: round; opacity: 0; }
 
-  .fork[data-pick="beginner"] .lane-beginner { stroke: var(--trk-b); stroke-width: 3; stroke-dasharray: none; opacity: 1; }
-  .fork[data-pick="beginner"] .dot-beginner { fill: var(--trk-b); stroke: var(--trk-b); }
-  .fork.is-done[data-pick="beginner"] .tick-beginner { opacity: 1; }
+  .fork[data-pick="base"] .lane-base { stroke: var(--trk-base); stroke-width: 3; stroke-dasharray: none; opacity: 1; }
+  .fork[data-pick="base"] .dot-base { fill: var(--trk-base); stroke: var(--trk-base); }
+  .fork.is-done[data-pick="base"] .tick-base { opacity: 1; }
 
-  .fork[data-pick="intermediate"] .lane-intermediate { stroke: var(--trk-i); stroke-width: 3; stroke-dasharray: none; opacity: 1; }
-  .fork[data-pick="intermediate"] .dot-intermediate { fill: var(--trk-i); stroke: var(--trk-i); }
-  .fork.is-done[data-pick="intermediate"] .tick-intermediate { opacity: 1; }
-
-  .fork[data-pick="advanced"] .lane-advanced { stroke: var(--trk-a); stroke-width: 3; stroke-dasharray: none; opacity: 1; }
-  .fork[data-pick="advanced"] .dot-advanced { fill: var(--trk-a); stroke: var(--trk-a); }
-  .fork.is-done[data-pick="advanced"] .tick-advanced { opacity: 1; }
+  .fork[data-pick="challenge"] .lane-challenge { stroke: var(--trk-chal); stroke-width: 3; stroke-dasharray: none; opacity: 1; }
+  .fork[data-pick="challenge"] .dot-challenge { fill: var(--trk-chal); stroke: var(--trk-chal); }
+  .fork.is-done[data-pick="challenge"] .tick-challenge { opacity: 1; }
 
   /* A fork on the current step still has to say "you are here". */
   .rail-item.current .fork .dot { stroke: var(--map-rust); stroke-width: 2.2; }
@@ -985,9 +980,6 @@
 
   .track-legend li { display: flex; align-items: center; gap: 8px; }
   .track-legend i { width: 9px; height: 9px; border-radius: 99px; flex: none; }
-  .track-legend .k-b { background: var(--trk-b); }
-  .track-legend .k-i { background: var(--trk-i); }
-  .track-legend .k-a { background: var(--trk-a); }
 
   /* ---------- the map: ink on aged paper ---------- */
 
@@ -1913,9 +1905,8 @@
     pointer-events: none;
   }
 
-  .rail-item.checkpoint .fork[data-pick="beginner"] .star-beginner,
-  .rail-item.checkpoint .fork[data-pick="intermediate"] .star-intermediate,
-  .rail-item.checkpoint .fork[data-pick="advanced"] .star-advanced { opacity: 1; }
+  .rail-item.checkpoint .fork[data-pick="base"] .star-base,
+  .rail-item.checkpoint .fork[data-pick="challenge"] .star-challenge { opacity: 1; }
 
   /* The waypoint, shrunk down. Drawn rather than typed, so it centres on the
      word beside it instead of hanging off a glyph baseline. */
@@ -3791,18 +3782,14 @@ Sam
   /* Steps that offer tracks draw a fork instead of a single node. */
   function forkMarkup() {
     return '<svg class="fork" viewBox="0 0 36 30" aria-hidden="true" focusable="false">' +
-      '<path class="lane lane-beginner" d="M18 0 C18 9 6 7 6 15 C6 23 18 21 18 30"/>' +
-      '<path class="lane lane-advanced" d="M18 0 C18 9 30 7 30 15 C30 23 18 21 18 30"/>' +
-      '<path class="lane lane-intermediate" d="M18 0 L18 30"/>' +
-      '<circle class="dot dot-beginner" cx="6" cy="15" r="4.4"/>' +
-      '<circle class="dot dot-intermediate" cx="18" cy="15" r="4.4"/>' +
-      '<circle class="dot dot-advanced" cx="30" cy="15" r="4.4"/>' +
-      '<path class="star star-beginner" d="M6.00 12.56 6.70 14.30 8.57 14.42 7.13 15.62 7.59 17.44 6.00 16.45 4.41 17.44 4.87 15.62 3.43 14.42 5.30 14.30Z"/>' +
-      '<path class="star star-intermediate" d="M18.00 12.56 18.70 14.30 20.57 14.42 19.13 15.62 19.59 17.44 18.00 16.45 16.41 17.44 16.87 15.62 15.43 14.42 17.30 14.30Z"/>' +
-      '<path class="star star-advanced" d="M30.00 12.56 30.70 14.30 32.57 14.42 31.13 15.62 31.59 17.44 30.00 16.45 28.41 17.44 28.87 15.62 27.43 14.42 29.30 14.30Z"/>' +
-      '<path class="tick tick-beginner" d="M3.9 15.1 l1.5 1.6 l2.9 -3.3"/>' +
-      '<path class="tick tick-intermediate" d="M15.9 15.1 l1.5 1.6 l2.9 -3.3"/>' +
-      '<path class="tick tick-advanced" d="M27.9 15.1 l1.5 1.6 l2.9 -3.3"/>' +
+      '<path class="lane lane-base" d="M18 0 C18 9 10 7 10 15 C10 23 18 21 18 30"/>' +
+      '<path class="lane lane-challenge" d="M18 0 C18 9 26 7 26 15 C26 23 18 21 18 30"/>' +
+      '<circle class="dot dot-base" cx="10" cy="15" r="4.4"/>' +
+      '<circle class="dot dot-challenge" cx="26" cy="15" r="4.4"/>' +
+      '<path class="star star-base" d="M10.00 12.56 10.70 14.30 12.57 14.42 11.13 15.62 11.59 17.44 10.00 16.45 8.41 17.44 8.87 15.62 7.43 14.42 9.30 14.30Z"/>' +
+      '<path class="star star-challenge" d="M26.00 12.56 26.70 14.30 28.57 14.42 27.13 15.62 27.59 17.44 26.00 16.45 24.41 17.44 24.87 15.62 23.43 14.42 25.30 14.30Z"/>' +
+      '<path class="tick tick-base" d="M7.9 15.1 l1.5 1.6 l2.9 -3.3"/>' +
+      '<path class="tick tick-challenge" d="M23.9 15.1 l1.5 1.6 l2.9 -3.3"/>' +
       "</svg>";
   }
 
@@ -3816,7 +3803,7 @@ Sam
     b.type = "button";
     b.className = "rail-item" + (id === "finale" ? " finale" : "");
     b.innerHTML = '<span class="marker-slot">' +
-      '<span class="node" aria-hidden="true"></span>' +
+      (hasTracks(id) ? forkMarkup() : '<span class="node" aria-hidden="true"></span>') +
       '</span><span class="rail-label"></span>';
     $(".rail-label", b).textContent = id === "finale" ? "Finish" : TITLES[id];
     b.addEventListener("click", function () { if (reachable(id)) go(id); });
