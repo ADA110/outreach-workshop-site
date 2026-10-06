@@ -2537,8 +2537,8 @@ and the output path runs/thin-test/02-draft.md</div>
           </ol>
           <p>What you want is an email that is honest about having little to say. What you often get is one that fills the gap with something plausible.</p>
           <p>If yours behaves, do not take the credit yet, and do not assume you wrote the thing that saved you.</p>
-          <p>If your Writer has an instruction for the empty case, anything telling it what to do when the brief gives it nothing, copy the file to <code>writer-noclause.md</code>, take that one instruction out, change the <code>name:</code> and <code>description:</code> lines to match, and run both over the same thin brief. If both produce the same email, the clause you were proud of was not doing the work you thought it was.</p>
-          <p>If all you wrote was a ban, you already have that result: yours is the arm without the clause. Add a clause and run it again. Either way you have measured something rather than demonstrated it, which is what this track is supposed to be about.</p>
+          <p>If your Writer has an instruction for the empty case, anything telling it what to do when the brief gives it nothing, copy the file to <code>writer-noclause.md</code>, take that one instruction out, change the <code>name:</code> and <code>description:</code> lines to match, and run both over the same thin brief, pointing the second one at the output path <code>runs/thin-test/02-draft-noclause.md</code> so it does not overwrite the first. If both produce the same email, the clause you were proud of was not doing the work you thought it was.</p>
+          <p>If all you wrote was a ban, you already have that result: yours is the arm without the clause. Add a clause and run it again, this time writing to <code>runs/thin-test/02-draft-clause.md</code>. Either way you have measured something rather than demonstrated it, which is what this track is supposed to be about.</p>
           <p>Adding that second agent needs no restart. The folder is being watched now.</p>
           <div class="note">
             <span class="note-label">That card overwrites your file</span>
@@ -2675,6 +2675,12 @@ When you have it all, write both files, keep the headings exactly as they are, a
         <p class="lede">The agents can't start themselves. Someone has to call them in the right order and hand each one the right files. That's the manager's job, and the manager is your main Claude Code session, the one you're typing into.</p>
         <p>You give the manager its instructions with the <strong>run prompt</strong>. Type your real top target into the card, then copy the prompt and paste it into Claude:</p>
         <p><strong>Person is optional.</strong> Fill it in if you know who should receive this, and the Writer will greet them by name. Leave it blank and the email opens with a bare <code>Hi,</code> for you to complete before you send. With a person the prompt's first line reads <code>Company | Role | Person</code>; without one it is just <code>Company | Role</code>.</p>
+        <div data-level="advanced">
+          <div class="note">
+            <span class="note-label">Take a cost reading before you paste</span>
+            <p>Run <code>/usage</code> now, before you paste the prompt below, and write the number down. You take a second reading the moment the run finishes, and the <em>difference</em> between the two is what one plain run costs. It is the only number later steps can compare against, and it is the one reading you cannot go back for.</p>
+          </div>
+        </div>
         <div class="files" data-run></div>
         <div class="note">
           <span class="note-label">Read it before you paste</span>
@@ -2718,8 +2724,8 @@ When you have it all, write both files, keep the headings exactly as they are, a
             <p>Check the body word count in <code>03-final.md</code> against the cap in your Editor. You come back to that number in the next step, when you deliberately set your rulebook against it.</p>
           </div>
           <div class="note">
-            <span class="note-label">Get a baseline before you start measuring</span>
-            <p>Run <code>/usage</code> immediately before this run and immediately after it, and write down <em>the difference</em>. That difference is what one plain run costs, and it is the only number later steps can compare against. The two totals on their own are not useful. It reports the session's cumulative tokens with a cost figure, and on a subscription its Attribution section breaks out how much went to subagents, which is where nearly all of it goes: your main session only sends three short delegations here and reads three one-sentence replies, and four once you add the Recruiter.</p>
+            <span class="note-label">Now take the second reading</span>
+            <p>Run <code>/usage</code> again now that the run has finished, and write down <em>the difference</em> between this and the reading you took before you pasted the prompt. That difference is what one plain run costs, and it is the only number later steps can compare against. The two totals on their own are not useful. It reports the session's cumulative tokens with a cost figure, and on a subscription its Attribution section breaks out how much went to subagents, which is where nearly all of it goes: your main session only sends three short delegations here and reads three one-sentence replies, and four once you add the Recruiter.</p>
             <p>Keep it somewhere outside the session, in <code>notes/usage.md</code> or on paper. Usage totals reset when the session does, and this track is long enough that most people finish it over more than one sitting. If you come back without the number, take one plain run's before-and-after as a fresh baseline instead.</p>
             <p>If you are billed through an API key rather than a subscription there is no Attribution section. Record total tokens instead, and treat everything above your own three short delegations as the subagent share.</p>
             <p>Use <code>/usage</code> rather than <code>/context</code>. <code>/context</code> shows how full your current context window is, not what the run cost, and it cannot see inside a subagent at all. When you add the Recruiter you will be asked what the extra agent cost, and this run is what you compare it against: one pipeline, three agents, nothing else in the way.</p>
@@ -2837,7 +2843,7 @@ score, then the three numbers. Comment on nothing else.</div>
             <p>Handed the email alone, a judge cannot check a hook against anything, so it scores how specific the email <em>sounds</em>. That is the same failure your Writer has when the brief is thin, one level up. A rubric without the source material measures fluency and calls it accuracy.</p>
           </div>
           <p>Then answer the only question that matters: is the gap between A and B bigger than the spread <em>within</em> each of them? If the tighter arm is the one you happen to call A, comparing against it alone will flatter your result.</p>
-          <p>Then finish the job. If one arm won by more than its own spread, copy that file over <code>.claude/agents/editor.md</code>. If it did not, keep the Editor you had and write down that the comparison was inconclusive, which is a result. Either way the next step delegates to <code>editor</code>, so a comparison you do not fold back is one you threw away.</p>
+          <p>Then finish the job, using that same test and no other. If the gap beat the spread inside <em>both</em> arms, copy the winning file over <code>.claude/agents/editor.md</code>, then change its <code>name:</code> line back to <code>editor</code> and its <code>description:</code> back to what stage three does. The manager delegates to the <code>name:</code> field and never to the filename, so an <code>editor.md</code> that still says <code>name: editor-b</code> leaves you with no Editor at all. If the gap did not clear both spreads, keep the Editor you had and write down that the comparison was inconclusive, which is a result. Either way, delete <code>editor-a.md</code> and <code>editor-b.md</code> once you are done, and remember that the next step delegates to <code>editor</code>, so a comparison you do not fold back is one you threw away.</p>
           <details class="bail">
             <p>Short on time: one run per version, and treat the result as a hint rather than a finding. Say which it is when you talk about it.</p>
           </details>
