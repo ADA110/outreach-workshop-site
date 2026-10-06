@@ -2395,11 +2395,11 @@
         <div class="task" data-level="advanced">
           <p>Take the permissions file as given, then write the rulebook yourself.</p>
           <div class="files" data-files="settings"></div>
-          <p>Write <code>CLAUDE.md</code> without looking at ours. It has to carry three things: the org chart of who reads and writes what, the handoff rules, and the hard rules you want to hold across every agent. Whether they actually hold against an agent's own prompt is the experiment below, and the answer is less comfortable than the spec sounds.</p>
+          <p>Write <code>CLAUDE.md</code> without looking at ours. It has to carry three things: the org chart of who reads and writes what, the handoff rules, and the hard rules you want to hold across every agent. Whether they actually hold against an agent's own prompt is not something this file can tell you. You set your rulebook against your Editor's own prompt later, once you have both and can run them, and the answer is less comfortable than the spec sounds.</p>
           <p>Then test it rather than admiring it. Write down one rule an agent could obey while still breaking the pipeline, and one the manager could obey while still doing the Editor's job for it. If you cannot find either, your rules are too vague to constrain anything, and that is worth more than a clean diff against ours.</p>
           <div class="note">
             <span class="note-label">That card overwrites your file</span>
-            <p>The prompt inside it says "copy it verbatim", so pasting it replaces what you just wrote. Read it here instead, or ask Claude to write ours to <code>_compare/</code> and diff the two.</p>
+            <p>The prompt inside it says "copy it verbatim", so pasting it replaces what you just wrote. Read it here and compare by eye instead. Writing ours to a second file and diffing would need permissions this project does not grant, and it would leave a second rulebook sitting in the project.</p>
           </div>
           <details class="bail">
             <summary>Compare with ours once yours exists</summary>
@@ -2420,12 +2420,9 @@
           </div>
         </div>
         <div class="note">
-          <span class="note-label">If Claude refuses to create the permissions file</span>
-          <p>If it tells you it cannot grant itself permissions, you are in auto mode. Switch to Accept Edits, in the same row as the model picker, and paste the prompt again.</p>
-        </div>
-        <div class="note">
-          <span class="note-label">You'll be asked to approve each write</span>
-          <p>Claude Code reads the permissions file the moment it exists, but you are creating it right now, so the first two writes still come to you. Approve them. Everything after that, the agent files, your own files and the run output, is covered by the allow list you just created.</p>
+          <span class="note-label">You should not be asked to approve these</span>
+          <p>You set Accept Edits before you started, so Claude creates both files without stopping. Everything after this, the agent files, your own files and the run output, is covered by the allow list you are creating right now.</p>
+          <p>If Claude does stop and tells you it cannot grant itself permissions, you are in auto mode. Switch to Accept Edits, in the same row as the model picker, and paste the prompt again.</p>
         </div>
         <div class="ask">
           <span class="mono-label">Read it before you move on</span>
@@ -2508,7 +2505,7 @@
           </div>
           <p>Then prove one of your decisions holds. Your Writer is supposed to be unable to invent facts about the company. Test it with a brief that gives it almost nothing:</p>
           <ol class="list">
-            <li>Create <code>runs/thin-test/01-brief.md</code>, a brief with the same sections as a real one and nothing in them worth using:
+            <li>Create <code>runs/thin-test/01-brief.md</code>, a brief in the shape yours produces with nothing in it worth using. Adapt the section names below if your schema differs:
               <div class="cmd">Create a file at runs/thin-test/01-brief.md with exactly these contents:
 
 COMPANY: Northwind Freight
@@ -2539,10 +2536,13 @@ and the output path runs/thin-test/02-draft.md</div>
             <li>Open the draft. Count every claim it makes about the company, and check how many trace back to your one fact.</li>
           </ol>
           <p>What you want is an email that is honest about having little to say. What you often get is one that fills the gap with something plausible.</p>
-          <p>If yours behaves, do not take the credit yet. Write a second Writer with the empty-case clause taken out, run it over the same thin brief, and compare. If both produce the same email, the clause you were proud of was not doing the work you thought it was. That is the difference between a demonstration and a measurement, and this track is supposed to be about the second one.</p>
+          <p>If yours behaves, do not take the credit yet, and do not assume you wrote the thing that saved you.</p>
+          <p>If your Writer has an instruction for the empty case, anything telling it what to do when the brief gives it nothing, copy the file to <code>writer-noclause.md</code>, take that one instruction out, change the <code>name:</code> and <code>description:</code> lines to match, and run both over the same thin brief. If both produce the same email, the clause you were proud of was not doing the work you thought it was.</p>
+          <p>If all you wrote was a ban, you already have that result: yours is the arm without the clause. Add a clause and run it again. Either way you have measured something rather than demonstrated it, which is what this track is supposed to be about.</p>
+          <p>Adding that second agent needs no restart. The folder is being watched now.</p>
           <div class="note">
             <span class="note-label">That card overwrites your file</span>
-            <p>The prompt inside it says "copy it verbatim", so pasting it replaces what you just wrote. Read it here instead, or ask Claude to write ours to <code>_compare/</code> and diff the two.</p>
+            <p>The prompt inside it says "copy it verbatim", so pasting it replaces what you just wrote. Read it here and compare by eye instead. Writing ours to a second file and diffing would need permissions this project does not grant, and it would leave a second rulebook sitting in the project.</p>
           </div>
           <details class="bail">
             <summary>The three standard agents, to compare against or fall back on</summary>
@@ -2595,7 +2595,7 @@ and the output path runs/thin-test/02-draft.md</div>
         </div>
         <p>Once you're back in, ask Claude:</p>
         <div class="cmd">Without opening any files, list the subagents you can delegate to right now. For each one, give its description and the exact tools it is allowed to use.</div>
-        <p>You will see more than three. Claude Code ships with its own helpers, with names like general-purpose, Explore and Plan, and those have always been there. What you are checking is that <code>researcher</code>, <code>writer</code> and <code>editor</code> are in the list too, and that the tools are right: the Researcher has web search and web fetch on top of read and write, and the other two have read and write only. The web tools are the tell. The tool lists are the point. They live inside your agent files and nowhere else, so a session that loaded nothing cannot answer without opening them.</p>
+        <p>You will see more than three. Claude Code ships with its own helpers, with names like general-purpose, Explore and Plan, and those have always been there. You may also see extra agents you created yourself. What you are checking is that <code>researcher</code>, <code>writer</code> and <code>editor</code> are in the list, and that the tools are right: the Researcher has web search and web fetch on top of read and write, and the other two have read and write only. The web tools are the tell. The tool lists are the point. They live inside your agent files and nowhere else, so a session that loaded nothing cannot answer without opening them.</p>
         <div class="note">
           <span class="note-label">Why "without opening any files" is doing the work</span>
           <p><code>CLAUDE.md</code> names all three agents and is already open, so asking for names alone gets you the right answer whether or not a single agent loaded. The agent files are on disk either way too, so a session that can read them can report anything in them. The only thing that separates a loaded session from an unloaded one is what it can tell you <em>without looking</em>.</p>
@@ -2684,7 +2684,7 @@ When you have it all, write both files, keep the headings exactly as they are, a
           <span class="note-label">What to expect while it runs</span>
           <p>Two to five minutes. The Researcher is the slow part, because it is doing real web searches, and long gaps with nothing on screen are normal. You will see three rows appear in the transcript, labelled <code>researcher</code>, <code>writer</code> and <code>editor</code>, each finishing with a single sentence.</p>
           <p><strong>If Claude says it has no <code>researcher</code> subagent</strong>, the restart in Step 04 did not take. Go back and run the check prompt there.</p>
-          <p><strong>If Claude mentions it has no <code>recruiter</code> subagent</strong>, nothing is wrong. There is a fourth agent you add later, and the run prompt is written to work whether or not it exists yet.</p>
+          <p><strong>Claude should pass over the recruiter without a word</strong>, because the run prompt tells it to. If it mentions one is missing anyway, nothing is wrong: there is a fourth agent you add later, and the prompt works whether or not it exists yet.</p>
           <p><strong>If the brief comes back with one or two facts</strong>, that is the Researcher being honest rather than inventing, and your email will be shorter because of it. Open <code>01-brief.md</code> and see what it could not verify.</p>
           <p><strong>If nothing has happened for five minutes</strong>, paste: <em>Where are you in the pipeline, and which file are you waiting on?</em></p>
         </div>
@@ -2714,15 +2714,15 @@ When you have it all, write both files, keep the headings exactly as they are, a
         </div>
         <div data-level="advanced">
           <div class="note">
-            <span class="note-label">The contradiction you planted at Step 02</span>
-            <p>This is the run that answers it. Check the word count in <code>03-final.md</code> against the two rules you set against each other, run it once more to see whether it lands the same way twice, then go back and delete the line.</p>
+            <span class="note-label">One thing to notice now</span>
+            <p>Check the body word count in <code>03-final.md</code> against the cap in your Editor. You come back to that number in the next step, when you deliberately set your rulebook against it.</p>
           </div>
           <div class="note">
             <span class="note-label">Get a baseline before you start measuring</span>
-            <p>Run <code>/usage</code> before and after this run and write both numbers down. It reports the session's cumulative tokens with a cost figure, and on a subscription its Attribution section breaks out how much went to subagents, which is where nearly all of it goes: your main session only sends three short delegations here and reads three one-sentence replies, and four once you add the Recruiter.</p>
-            <p>Write the absolute number down somewhere outside the session, on paper or in a file. Usage totals reset when the session does, and this track is long enough that most people finish it over more than one sitting. If you come back without the number, take one plain run's reading as a fresh baseline instead.</p>
+            <p>Run <code>/usage</code> immediately before this run and immediately after it, and write down <em>the difference</em>. That difference is what one plain run costs, and it is the only number later steps can compare against. The two totals on their own are not useful. It reports the session's cumulative tokens with a cost figure, and on a subscription its Attribution section breaks out how much went to subagents, which is where nearly all of it goes: your main session only sends three short delegations here and reads three one-sentence replies, and four once you add the Recruiter.</p>
+            <p>Keep it somewhere outside the session, in <code>notes/usage.md</code> or on paper. Usage totals reset when the session does, and this track is long enough that most people finish it over more than one sitting. If you come back without the number, take one plain run's before-and-after as a fresh baseline instead.</p>
             <p>If you are billed through an API key rather than a subscription there is no Attribution section. Record total tokens instead, and treat everything above your own three short delegations as the subagent share.</p>
-            <p>Use <code>/usage</code> rather than <code>/context</code>. <code>/context</code> shows how full your current context window is, not what the run cost, and it cannot see inside a subagent at all. When you add the Recruiter you will be asked what the extra agent cost you, and this is the only untouched run you will have to compare against.</p>
+            <p>Use <code>/usage</code> rather than <code>/context</code>. <code>/context</code> shows how full your current context window is, not what the run cost, and it cannot see inside a subagent at all. When you add the Recruiter you will be asked what the extra agent cost, and this run is what you compare it against: one pipeline, three agents, nothing else in the way.</p>
           </div>
         </div>
         <div class="ask">
@@ -2746,7 +2746,7 @@ When you have it all, write both files, keep the headings exactly as they are, a
         <p class="lede">Your three agents exist and you've seen them run. The email they produced is probably close but not quite what you would have written. This round is where you push it towards what you actually want, by tweaking one agent and watching what moves.</p>
         <div class="note">
           <span class="note-label">This round is optional</span>
-          <p>You can go straight to the next step and nothing later depends on having done this. It is worth doing anyway. You wrote those three agents blind, before you had seen a single email come out of them, so the first result is almost never the one you had in mind. This is where you close that gap, and changing one thing and watching what moves is the habit you will use every time you build something like this.</p>
+          <p>You can go straight to the next step. The only thing later steps borrow from this one is a cost reading, and they tell you what to do if you skipped it. It is worth doing anyway. You wrote those three agents blind, before you had seen a single email come out of them, so the first result is almost never the one you had in mind. This is where you close that gap, and changing one thing and watching what moves is the habit you will use every time you build something like this.</p>
         </div>
         <div class="note">
           <span class="note-label">Step 06's output is safe</span>
@@ -2819,7 +2819,8 @@ First ask me which agent I changed. Then copy forward from my last run's folder 
               <div class="cmd">Delegate to the editor-a subagent. Give it only these paths: runs/&lt;slug&gt;/02-draft.md, runs/&lt;slug&gt;/01-brief.md, me/voice-samples.md, and the output path runs/&lt;slug&gt;/03-final-a1.md. Do not paste any file contents.</div>
             </li>
             <li><strong>Judge somewhere that has not watched you work.</strong> Label the four finals X1, X2, Y1, Y2, then hand the judging to a fresh session or to a subagent that gets the four finals, the brief and your voice samples, and nothing about how any of them were made. Relabelling hides nothing from the session that just watched you write <code>editor-b.md</code>.</li>
-            <li><strong>Compare.</strong> Lay the twelve scores out in a table. Look at the spread <em>within</em> each version before you look at the gap <em>between</em> them.</li>
+            <li><strong>Strip the <code>EDITOR'S NOTE:</code> line from all four first.</strong> It is the Editor saying what it changed and why, and on a good day it names your manipulation outright. Relabelling files is pointless while that line is still in them.</li>
+            <li><strong>Compare.</strong> Lay the scores out in a table. Look at the spread <em>within</em> each version before you look at the gap <em>between</em> them.</li>
           </ol>
           <div class="cmd">Read the brief for this run and me/voice-samples.md first. Then score
 the email below 1 to 5 on hook specificity, voice match, and ask clarity.
@@ -2836,7 +2837,7 @@ score, then the three numbers. Comment on nothing else.</div>
             <p>Handed the email alone, a judge cannot check a hook against anything, so it scores how specific the email <em>sounds</em>. That is the same failure your Writer has when the brief is thin, one level up. A rubric without the source material measures fluency and calls it accuracy.</p>
           </div>
           <p>Then answer the only question that matters: is the gap between A and B bigger than the spread <em>within</em> each of them? If the tighter arm is the one you happen to call A, comparing against it alone will flatter your result.</p>
-          <p>Take a <code>/usage</code> reading now and write it down too. You have just spent six runs on this comparison, so when you add the Recruiter you compare against this number rather than against your first run.</p>
+          <p>Then finish the job. If one arm won by more than its own spread, copy that file over <code>.claude/agents/editor.md</code>. If it did not, keep the Editor you had and write down that the comparison was inconclusive, which is a result. Either way the next step delegates to <code>editor</code>, so a comparison you do not fold back is one you threw away.</p>
           <details class="bail">
             <p>Short on time: one run per version, and treat the result as a hint rather than a finding. Say which it is when you talk about it.</p>
           </details>
@@ -2942,8 +2943,10 @@ score, then the three numbers. Comment on nothing else.</div>
             <li>Compare <code>03-final.md</code> with <code>03-final-v2.md</code> and write down exactly what the Writer changed to raise its score.</li>
             <li>Now change one thing in the rubric that you would not want optimised, such as rewarding detail, and run again.</li>
           </ol>
-          <p>Run <code>/usage</code> again when you are done. The Recruiter is one more agent, and a run where the loop fires is three more delegations. Write down what the fourth agent cost you as a share of your reading from the end of Step 07, then decide whether one point of score is worth it.</p>
-          <p>You are watching for the moment the email gets worse while the score goes up. One place to look first: the Recruiter reads the final and the brief, and never reads <code>me/background.md</code>. So a revision that invents a claim about <em>you</em> to raise its score is the one kind of damage nothing in the pipeline can see.</p>
+          <p>Price the fourth agent while you are here. Take a <code>/usage</code> reading immediately before this run and immediately after it: that difference is what a run costs with the Recruiter in it, and a run where the loop fires carries three more delegations than one where it does not. Set it against the one-run difference you recorded earlier, not against any cumulative total, and decide whether one point of score is worth it.</p>
+          <p>The Attribution section will not do this for you. It reports shares of a whole session, so by now it is averaging over every run you have done. The before-and-after difference is the only thing that isolates one agent.</p>
+          <p>You are watching for the moment the email gets worse while the score goes up. One place to look first: the Recruiter reads the final and the brief, and never reads <code>me/background.md</code>. So a revision that invents a claim about <em>you</em> to raise its score is damage the reviewer cannot catch.</p>
+          <p>Your Editor may catch it instead, if you gave it a rule about unsourced claims about the candidate and not only about the company. Ours does not. Check your Editor before you decide the warning is wrong, and notice that you only have that guard because you wrote it.</p>
           <div class="files" data-run></div>
           <details class="bail">
             <summary>Ours, if you would rather not write one</summary>
@@ -2951,7 +2954,7 @@ score, then the three numbers. Comment on nothing else.</div>
           </details>
         </div>
 
-        <p>This round writes to its own folder. If you followed Step 07 as written, Step 06 took <code>runs/stripe/</code>, Step 07 took <code>runs/stripe-2/</code>, and this one is <code>runs/stripe-3/</code>. Claude names the folder when it finishes, and both verdicts are in there.</p>
+        <p>This round writes to its own folder, and which number it gets depends on how many pipeline runs you have done. Read the name Claude gives you when it finishes rather than predicting it. Both verdicts are in there.</p>
         <p>The Recruiter scores the final email out of 10. Under 8 sends it back to the Writer for exactly one revision, then the Editor, then the Recruiter scores it again. Read both verdicts:</p>
         <ol class="list">
           <li><code>04-review.md</code>: the first score and its objections</li>
