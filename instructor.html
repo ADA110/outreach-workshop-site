@@ -469,7 +469,7 @@
   var PLANNED = { overview: 4, prep: 0, folder: 3, base: 3, agents: 5, restart: 2, me: 5, r1: 12, r2: 10, r3: 10, debrief: 5 };
   var MILESTONES = { restart: 1, r1: 1, r3: 1, debrief: 1 };
   var WORDS = ["", "Not useful", "Needs work", "Okay", "Good", "Great"];
-  var LEVEL_LABEL = { beginner: "Beginner", intermediate: "Intermediate", advanced: "Advanced" };
+  var LEVEL_LABEL = { base: "Base", challenge: "Challenge" };
 
   var params = new URLSearchParams(location.search);
   var room = cleanRoom(params.get("room"));
@@ -611,7 +611,7 @@
       var since = lastDone || s.joinedAt;
       return {
         name: s.name, email: s.email, id: s.id, steps: s.steps, stepAt: s.stepAt,
-        level: s.level || "beginner", levels: s.levels || {},
+        level: s.level || "base", levels: s.levels || {},
         done: s.doneCount, cur: cur, finished: !cur,
         joinedAt: s.joinedAt, updatedAt: s.updatedAt,
         onStepMin: since ? (now - new Date(since).getTime()) / 60000 : null,
@@ -751,16 +751,14 @@
 
     $("#mix").innerHTML = d.steps.map(function (id) {
       var took = d.students.filter(function (s) { return s.steps[id]; });
-      var counts = { beginner: 0, intermediate: 0, advanced: 0 };
-      took.forEach(function (s) { counts[s.levels[id] || "beginner"]++; });
-      var beyond = counts.intermediate + counts.advanced;
-      var pct = took.length ? beyond / took.length * 100 : 0;
-      var tip = (TITLES[id] || id) + ": " + counts.beginner + " Beginner, " + counts.intermediate +
-        " Intermediate, " + counts.advanced + " Advanced";
+      var counts = { base: 0, challenge: 0 };
+      took.forEach(function (s) { counts[s.levels[id] === "challenge" ? "challenge" : "base"]++; });
+      var pct = took.length ? counts.challenge / took.length * 100 : 0;
+      var tip = (TITLES[id] || id) + ": " + counts.base + " Base, " + counts.challenge + " Challenge";
       return '<div class="row"><span class="lab">' + label(id) + "</span>" +
         '<div class="track" data-tip="' + esc(tip) + '"><span class="fill" style="width:' + pct + '%"></span></div>' +
-        '<span class="val">' + (took.length ? counts.beginner + "/" + counts.intermediate + "/" + counts.advanced : "") + "</span></div>";
-    }).join("") + '<p class="sub" style="padding-top:8px">Counts read Beginner / Intermediate / Advanced.</p>';
+        '<span class="val">' + (took.length ? counts.base + "/" + counts.challenge : "") + "</span></div>";
+    }).join("") + '<p class="sub" style="padding-top:8px">Counts read Base / Challenge.</p>';
   }
 
   function renderRatings(ratings, avg) {
