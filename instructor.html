@@ -451,11 +451,6 @@
         </table>
       </div>
     </section>
-    <section class="panel span-5" aria-labelledby="h-rating">
-      <h2 id="h-rating">Ratings</h2>
-      <p class="sub" id="rating-sub">From the finish screen.</p>
-      <div class="rows" id="rating"></div>
-    </section>
     <section class="panel span-12" aria-labelledby="h-fb">
       <h2 id="h-fb">Feedback</h2>
       <div id="feedback"></div>
@@ -651,8 +646,6 @@
   function render() {
     var d = derive();
     var n = d.students.length;
-    var ratings = data.feedback.map(function (f) { return f.rating; }).filter(Boolean);
-    var avgRating = ratings.length ? ratings.reduce(function (a, b) { return a + b; }, 0) / ratings.length : null;
     var finished = d.students.filter(function (s) { return s.finished; }).length;
     var avgProgress = n ? Math.round(d.students.reduce(function (a, s) { return a + s.done; }, 0) / (n * d.steps.length) * 100) : 0;
     var active = d.students.filter(function (s) { return s.updatedAt && d.now - new Date(s.updatedAt).getTime() < 10 * 60000; }).length;
@@ -677,7 +670,6 @@
 
     renderWhere(d, n);
     renderMix(d);
-    renderRatings(ratings, avgRating);
     renderFeedback(d);
     renderStudents(d);
   }
@@ -728,21 +720,6 @@
     }).join("") + '<p class="sub" style="padding-top:8px">Counts read Base / Challenge.</p>';
   }
 
-  function renderRatings(ratings, avg) {
-    $("#rating-sub").textContent = ratings.length
-      ? "Average " + avg.toFixed(1) + " out of 5 from " + ratings.length + " rating" + (ratings.length === 1 ? "" : "s") + "."
-      : "No ratings yet. Students rate the workshop on the finish screen.";
-    if (!ratings.length) { $("#rating").innerHTML = ""; return; }
-    var counts = [0, 0, 0, 0, 0, 0];
-    ratings.forEach(function (r) { counts[r]++; });
-    var max = Math.max.apply(null, counts);
-    $("#rating").innerHTML = [5, 4, 3, 2, 1].map(function (r) {
-      var tip = r + " star" + (r === 1 ? "" : "s") + " (" + WORDS[r] + "): " + counts[r] + " of " + ratings.length;
-      return '<div class="row"><span class="lab">' + "★".repeat(r) + " " + WORDS[r] + "</span>" +
-        '<div class="track" data-tip="' + esc(tip) + '"><span class="fill" style="width:' + (max ? counts[r] / max * 100 : 0) + '%"></span></div>' +
-        '<span class="val">' + counts[r] + "</span></div>";
-    }).join("");
-  }
 
   function renderFeedback(d) {
     var list = data.feedback.slice().sort(function (a, b) { return String(b.at).localeCompare(String(a.at)); });
