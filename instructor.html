@@ -244,16 +244,6 @@
     box-shadow: 0 0 0 2px var(--surface);
   }
 
-  .here {
-    display: inline-block;
-    font-family: var(--f-mono);
-    font-size: 11px;
-    color: var(--ink);
-    background: var(--accent-soft);
-    border-radius: 99px;
-    padding: 0 7px;
-  }
-
   .axis {
     display: grid;
     grid-template-columns: minmax(150px, 210px) minmax(0, 1fr) 84px;
@@ -453,8 +443,8 @@
     <section class="tiles" id="tiles" aria-label="Summary"></section>
 
     <section class="panel span-7" aria-labelledby="h-where">
-      <h2 id="h-where">Where the room is</h2>
-      <p class="sub">How many students have finished each step. The tag on the right counts who is working on that step right now.</p>
+      <h2 id="h-where">How many finished each step</h2>
+      <p class="sub">Counts everyone with that step behind them, so it only ever goes up.</p>
       <div class="rows" id="where"></div>
     </section>
     <section class="panel span-5" aria-labelledby="h-mix">
@@ -782,19 +772,13 @@
 
   function renderWhere(d, n) {
     if (!n) { $("#where").innerHTML = '<p class="empty">No students yet. They appear as soon as they sign in.</p>'; return; }
-    var hereNow = {};
-    d.students.forEach(function (s) { if (s.cur) hereNow[s.cur] = (hereNow[s.cur] || 0) + 1; });
-
     $("#where").innerHTML = d.steps.map(function (id) {
       var done = d.students.filter(function (s) { return s.steps[id]; }).length;
       var pct = done / n * 100;
-      var here = hereNow[id] || 0;
-      var tip = (TITLES[id] || id) + ": " + done + " of " + n + " finished (" + Math.round(pct) + "%)" +
-        (here ? ", " + here + " working on it now" : "");
+      var tip = (TITLES[id] || id) + ": " + done + " of " + n + " finished (" + Math.round(pct) + "%)";
       return '<div class="row"><span class="lab">' + label(id) + "</span>" +
         '<div class="track" data-tip="' + esc(tip) + '"><span class="fill" style="width:' + pct + '%"></span></div>' +
-        '<span class="val">' + done + ' <em class="pc">' + Math.round(pct) + '%</em>' +
-        (here ? ' <span class="here">' + here + " here</span>" : "") + "</span></div>";
+        '<span class="val">' + done + ' <em class="pc">' + Math.round(pct) + '%</em></span></div>';
     }).join("");
   }
 
