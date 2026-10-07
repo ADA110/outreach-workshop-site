@@ -2415,19 +2415,13 @@
         <p><strong>On Windows:</strong> close the window, then look in the system tray, the small icons next to the clock, and click the arrow to show hidden ones. If Claude is there, right-click it and choose <strong>Quit</strong> or <strong>Exit</strong>. To be sure it worked, check that Claude is gone from both the taskbar and the tray.</p>
         <p>Then open Claude again and click your <code>agents-outreach-team</code> session in the sidebar to pick up where you left off.</p>
         <p>Nothing you have built lives in the chat. Every file is on disk, so quitting loses none of it, and your conversation is still there when you come back.</p>
-        <p>Working in a terminal instead? Type <code>/exit</code>, then run <code>claude</code> again in the same folder.</p>
-        <p>The check below is how you find out whether it worked. Do it before you move on.</p>
         <div class="note">
           <span class="note-label">Why the restart is required</span>
-          <p>Claude Code watches <code>.claude/agents/</code> and picks up new or edited agents within seconds. The catch: it only watches folders that already existed when the session started. You created that folder a minute ago, inside a session that began before it existed, so nothing is watching it yet. Nothing will warn you either. Your main session will simply have no agents to hand work to.</p>
+          <p>Claude Code only watches <code>.claude/agents/</code> if the folder existed when the session started. Yours did not, so your agents are not loaded, and nothing will tell you.</p>
         </div>
         <p>Once you're back in, ask Claude:</p>
         <div class="cmd">Without opening any files, list the subagents you can delegate to right now. For each one, give its description and the exact tools it is allowed to use.</div>
-        <p>You will see more than three. Claude Code ships with its own helpers, with names like general-purpose, Explore and Plan, and those have always been there. You may also see extra agents you created yourself. What you are checking is that <code>researcher</code>, <code>writer</code> and <code>editor</code> are in the list, and that the tools are right: the Researcher has web search and web fetch on top of read and write, and the other two have read and write only. The web tools are the tell. The tool lists are the point. They live inside your agent files and nowhere else, so a session that loaded nothing cannot answer without opening them.</p>
-        <div class="note">
-          <span class="note-label">Why "without opening any files" is doing the work</span>
-          <p><code>CLAUDE.md</code> names all three agents and is already open, so asking for names alone gets you the right answer whether or not a single agent loaded. The agent files are on disk either way too, so a session that can read them can report anything in them. The only thing that separates a loaded session from an unloaded one is what it can tell you <em>without looking</em>.</p>
-        </div>
+        <p>You will see more than three. Claude Code ships with its own helpers, with names like general-purpose, Explore and Plan, and those have always been there. You may also see extra agents you created yourself. What you are checking is that <code>researcher</code>, <code>writer</code> and <code>editor</code> are in the list, and that the tools are right: the Researcher has web search and web fetch on top of read and write, and the other two have read and write only. The web tools are the tell: they live inside your agent files and nowhere else, so a session that loaded nothing cannot answer without opening them.</p>
         <div class="note">
           <span class="note-label">If it comes back empty</span>
           <p>If <code>researcher</code>, <code>writer</code> and <code>editor</code> are missing from the list, or Claude offers to read the files instead of answering, the restart did not take. Check that your files are at <code>.claude/agents/researcher.md</code>, <code>writer.md</code> and <code>editor.md</code> inside the <code>agents-outreach-team</code> folder, then quit Claude again, checking this time that it has really stopped, and open it once more. Seeing helpers you did not create is not a problem.</p>
