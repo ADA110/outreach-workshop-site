@@ -2563,11 +2563,11 @@ When you have it all, write both files, keep the headings exactly as they are, a
         <p class="lede">Your three agents exist and you've seen them run. The email they produced is probably close but not quite what you would have written. This round is where you push it towards what you actually want, by tweaking one agent and watching what moves.</p>
         <div class="note">
           <span class="note-label">This round is optional</span>
-          <p>You can go straight to the next step. The only thing later steps borrow from this one is a cost reading, and they tell you what to do if you skipped it. It is worth doing anyway. You wrote those three agents blind, before you had seen a single email come out of them, so the first result is almost never the one you had in mind. This is where you close that gap, and changing one thing and watching what moves is the habit you will use every time you build something like this.</p>
+          <p>Nothing later depends on it. Worth doing anyway: you wrote those three agents blind, before seeing a single email come out of them. Changing one thing and watching what moves is the habit you will reuse every time you build something like this.</p>
         </div>
         <div class="note">
-          <span class="note-label">Step 06's output is safe</span>
-          <p>Every run writes to a fresh folder, <code>runs/stripe-2/</code> and so on, because the project never overwrites a previous run. Editing an agent takes effect without restarting, and so does adding a new one, now that <code>.claude/agents/</code> exists. Step 04 was the one restart you needed, and it was needed because the folder itself was new.</p>
+          <span class="note-label">No second restart</span>
+          <p>Editing an agent takes effect without restarting, and so does adding a new one, now that <code>.claude/agents/</code> exists. Step 04 was the one restart you needed, and it was needed because the folder itself was new.</p>
         </div>
 
         
@@ -2584,10 +2584,6 @@ When you have it all, write both files, keep the headings exactly as they are, a
           <div class="cmd">Run the pipeline again for the same target, in a new run folder, and change only the agent I edited.
 
 First ask me which agent I changed. Then copy forward from my last run's folder every file produced before that agent's step, run that agent and every agent after it, and leave my last run's folder untouched. Tell me both folder names when you are done.</div>
-          <div class="note">
-            <span class="note-label">Why it asks</span>
-            <p>Everything upstream of the agent you changed can be reused, and everything from it down has to run again. Change the Editor and the brief and the draft carry over. Change the Writer and only the brief does. Change the Researcher and nothing does, because the new brief <em>is</em> your change. One rule, three shapes, and Claude works out which one applies once it knows the answer.</p>
-          </div>
           <p>The new run lands in its own folder, <code>runs/&lt;company&gt;-2/</code>, and Step 06's folder is left alone. Read the two <code>03-final.md</code> files side by side.</p>
           <details class="bail">
             <summary>If Claude has lost the thread, or you restarted since Step 06</summary>
