@@ -62,6 +62,8 @@ export default async function handler(req, res) {
       level: cleanLevel(body.level),
       levels: cleanLevels(body.levels),
       doneCount: Object.keys(steps).length,
+      feedbackAck: body.feedbackAck === true || prev.feedbackAck === true,
+      feedbackAckAt: body.feedbackAck === true ? (prev.feedbackAckAt || now) : (prev.feedbackAckAt || null),
       joinedAt: prev.joinedAt || now,
       updatedAt: now,
     };

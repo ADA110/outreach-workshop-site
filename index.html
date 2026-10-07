@@ -3247,7 +3247,7 @@ Sam
     return fetch(API, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ name: state.name, email: state.email, steps: state.steps, level: state.level, levels: state.levels })
+      body: JSON.stringify({ name: state.name, email: state.email, steps: state.steps, level: state.level, levels: state.levels, feedbackAck: state.feedbackAck === true })
     })
       .then(function (r) {
         return r.json().catch(function () { return {}; }).then(function (j) {

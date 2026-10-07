@@ -1,5 +1,5 @@
 import {
-  STEPS, keys, cleanRoom, cleanSteps, cleanLevel, cleanLevels, parseRecord, storeOr503, instructorCheck, getRedis,
+  STEPS, CHOICE_STEPS, keys, cleanRoom, cleanSteps, cleanLevel, cleanLevels, parseRecord, storeOr503, instructorCheck, getRedis,
 } from "../lib/store.js";
 
 /**
@@ -56,6 +56,8 @@ export default async function handler(req, res) {
           level: cleanLevel(rec.level),
           levels: cleanLevels(rec.levels),
           doneCount: Object.keys(steps).length,
+          feedbackAck: rec.feedbackAck === true,
+          feedbackAckAt: rec.feedbackAckAt || null,
           joinedAt: rec.joinedAt || null,
           updatedAt: rec.updatedAt || null,
         };
@@ -81,6 +83,7 @@ export default async function handler(req, res) {
       ok: true,
       room,
       steps: STEPS,
+      choiceSteps: CHOICE_STEPS,
       now: new Date().toISOString(),
       rooms: await listRooms(),
       students,

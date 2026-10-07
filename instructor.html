@@ -332,6 +332,11 @@
   .pip.on { background: var(--done); border-color: var(--done); }
   .pip.on.chal { background: var(--accent); border-color: var(--accent); }
 
+  .pc { font-style: normal; color: var(--muted); font-size: 11.5px; margin-left: 4px; }
+  .fill.alt { background: var(--accent); }
+  .ack { color: var(--done); }
+  .back { color: var(--accent); }
+
   tr.srow { cursor: pointer; }
   tr.srow:hover > td { background: var(--surface-2); }
   tr.srow.open > td { background: var(--surface-2); }
@@ -421,7 +426,7 @@
     </section>
     <section class="panel span-5" aria-labelledby="h-mix">
       <h2 id="h-mix">Base and Challenge</h2>
-      <p class="sub">Share who took Challenge on each step, of those who finished it. The bar is Challenge; the numbers are Base / Challenge.</p>
+      <p class="sub">Only the three steps where the two tracks differ. The bar is Challenge; the numbers read Base % / Challenge %, of whoever finished that step.</p>
       <div class="rows" id="mix"></div>
     </section>
 
@@ -446,7 +451,7 @@
       </div>
       <div class="table-wrap">
         <table>
-          <thead><tr><th>Name</th><th>Email</th><th>Track</th><th>Progress</th><th>Current step</th><th>Joined</th><th>Last active</th><th>Rating</th></tr></thead>
+          <thead><tr><th>Name</th><th>Email</th><th>Track</th><th>Progress</th><th>Current step</th><th>Form</th><th>Came back</th><th>Joined</th><th>Last active</th><th>Rating</th></tr></thead>
           <tbody id="students"></tbody>
         </table>
       </div>
@@ -603,6 +608,14 @@
     return null;
   }
 
+  /* Finished a step on a later calendar day than the one they joined on. */
+  function cameBackLater(s) {
+    if (!s.joinedAt) return false;
+    var day = function (t) { return String(t).slice(0, 10); };
+    var first = day(s.joinedAt);
+    return Object.keys(s.stepAt || {}).some(function (k) { return s.stepAt[k] && day(s.stepAt[k]) > first; });
+  }
+
   function derive() {
     var steps = data.steps;
     var now = new Date(data.now).getTime();
@@ -620,6 +633,8 @@
         done: s.doneCount, cur: cur, finished: !cur,
         joinedAt: s.joinedAt, updatedAt: s.updatedAt,
         onStepMin: since ? (now - new Date(since).getTime()) / 60000 : null,
+        ack: s.feedbackAck === true,
+        cameBack: cameBackLater(s),
         fb: fbBy[s.id] || null
       };
     });
@@ -660,12 +675,17 @@
       return Object.keys(s.levels || {}).some(function (k) { return s.levels[k] === "challenge"; });
     }).length;
 
+    var ackN = d.students.filter(function (s) { return s.ack; }).length;
+    var backN = d.students.filter(function (s) { return s.cameBack; }).length;
+
     tiles([
       ["Students", n, n ? "signed in" : "none yet"],
       ["Finished", finished, n ? Math.round(finished / n * 100) + "% of the room" : "no one yet"],
       ["Average progress", avgProgress + "%", "of all " + d.steps.length + " steps"],
       ["Active", active, "finished a step in the last 10 min"],
-      ["On Challenge", chalAny, n ? Math.round(chalAny / n * 100) + "% of the room, on any step" : "no one yet"]
+      ["On Challenge", chalAny, n ? Math.round(chalAny / n * 100) + "% of the room, on any step" : "no one yet"],
+      ["Form filled", ackN, n ? Math.round(ackN / n * 100) + "% of the room" : "no one yet"],
+      ["Came back", backN, backN ? "finished a step on a later day" : "nobody yet"]
     ]);
 
     renderWhere(d, n);
@@ -698,26 +718,58 @@
         (here ? ", " + here + " working on it now" : "");
       return '<div class="row"><span class="lab">' + label(id) + "</span>" +
         '<div class="track" data-tip="' + esc(tip) + '"><span class="fill" style="width:' + pct + '%"></span></div>' +
-        '<span class="val">' + done + (here ? ' <span class="here">' + here + " here</span>" : "") + "</span></div>";
+        '<span class="val">' + done + ' <em class="pc">' + Math.round(pct) + '%</em>' +
+        (here ? ' <span class="here">' + here + " here</span>" : "") + "</span></div>";
     }).join("");
   }
 
 
 
   function renderMix(d) {
-    var any = d.students.some(function (s) { return Object.keys(s.levels).length; });
-    if (!any) { $("#mix").innerHTML = '<p class="empty">No steps finished yet.</p>'; return; }
+    var choice = (data.choiceSteps && data.choiceSteps.length ? data.choiceSteps : ["base", "agents", "r3"])
+      .filter(function (id) { return d.steps.indexOf(id) >= 0; });
+    var any = d.students.some(function (s) {
+      return choice.some(function (id) { return s.steps[id]; });
+    });
+    if (!any) { $("#mix").innerHTML = '<p class="empty">Nobody has finished one of the three steps with a choice yet.</p>'; return; }
 
-    $("#mix").innerHTML = d.steps.map(function (id) {
+    var rows = choice.map(function (id) {
       var took = d.students.filter(function (s) { return s.steps[id]; });
-      var counts = { base: 0, challenge: 0 };
-      took.forEach(function (s) { counts[s.levels[id] === "challenge" ? "challenge" : "base"]++; });
-      var pct = took.length ? counts.challenge / took.length * 100 : 0;
-      var tip = (TITLES[id] || id) + ": " + counts.base + " Base, " + counts.challenge + " Challenge";
+      var chal = took.filter(function (s) { return s.levels[id] === "challenge"; }).length;
+      var base = took.length - chal;
+      var pct = took.length ? chal / took.length * 100 : 0;
+      var tip = took.length
+        ? (TITLES[id] || id) + ": " + base + " Base (" + Math.round(100 - pct) + "%), " + chal + " Challenge (" + Math.round(pct) + "%), of " + took.length + " who finished it"
+        : (TITLES[id] || id) + ": nobody has finished it yet";
       return '<div class="row"><span class="lab">' + label(id) + "</span>" +
         '<div class="track" data-tip="' + esc(tip) + '"><span class="fill" style="width:' + pct + '%"></span></div>' +
-        '<span class="val">' + (took.length ? counts.base + "/" + counts.challenge : "") + "</span></div>";
-    }).join("") + '<p class="sub" style="padding-top:8px">Counts read Base / Challenge.</p>';
+        '<span class="val">' + (took.length ? Math.round(100 - pct) + "% / " + Math.round(pct) + "%" : "") + "</span></div>";
+    }).join("");
+
+    /* A switch is a choice step finished on the other track from the one they
+       set at the top. Counted over students who reached a choice step at all. */
+    var reached = d.students.filter(function (s) { return choice.some(function (id) { return s.steps[id]; }); });
+    var onBase = reached.filter(function (s) { return s.level !== "challenge"; });
+    var onChal = reached.filter(function (s) { return s.level === "challenge"; });
+    var upCount = onBase.filter(function (s) {
+      return choice.some(function (id) { return s.steps[id] && s.levels[id] === "challenge"; });
+    }).length;
+    var downCount = onChal.filter(function (s) {
+      return choice.some(function (id) { return s.steps[id] && s.levels[id] !== "challenge"; });
+    }).length;
+
+    function sw(label, num, den, hint) {
+      var pct = den ? Math.round(num / den * 100) : 0;
+      return '<div class="row"><span class="lab">' + esc(label) + "</span>" +
+        '<div class="track" data-tip="' + esc(hint + ": " + num + " of " + den) + '"><span class="fill alt" style="width:' + pct + '%"></span></div>' +
+        '<span class="val">' + (den ? pct + "% <em class=\'pc\'>" + num + "/" + den + "</em>" : "none") + "</span></div>";
+    }
+
+    $("#mix").innerHTML = rows +
+      '<p class="sub" style="padding-top:10px;padding-bottom:2px">Switchers</p>' +
+      sw("Base \u2192 Challenge", upCount, onBase.length, "Students set to Base who took Challenge on at least one step") +
+      sw("Challenge \u2192 Base", downCount, onChal.length, "Students set to Challenge who dropped to Base on at least one step") +
+      '<p class="sub" style="padding-top:8px">Bars read Challenge. Percentages are of the students who finished that step.</p>';
   }
 
 
@@ -745,7 +797,7 @@
     });
 
     if (!rows.length) {
-      $("#students").innerHTML = '<tr><td colspan="8" class="empty">' + (d.students.length ? "No students match that filter." : "No students yet.") + "</td></tr>";
+      $("#students").innerHTML = '<tr><td colspan="10" class="empty">' + (d.students.length ? "No students match that filter." : "No students yet.") + "</td></tr>";
       return;
     }
 
@@ -765,9 +817,11 @@
         "<td>" + split + "</td>" +
         '<td class="num"><span class="pips" aria-hidden="true">' + pips + "</span>" + s.done + "/" + d.steps.length + "</td>" +
         "<td>" + (s.finished ? '<span class="done-tag">✓ finished</span>' : esc(TITLES[s.cur] || s.cur)) + "</td>" +
+        '<td>' + (s.ack ? '<span class="ack">✓</span>' : "") + "</td>" +
+        '<td>' + (s.cameBack ? '<span class="back">✓</span>' : "") + "</td>" +
         '<td class="num">' + ago(s.joinedAt, d.now) + '</td><td class="num">' + ago(s.updatedAt, d.now) + "</td>" +
         '<td class="num">' + (s.fb ? "★ " + s.fb.rating : "") + "</td></tr>" +
-        '<tr class="detail" data-for="' + esc(s.id) + '" hidden><td colspan="8">' + pathOf(s, d) + "</td></tr>";
+        '<tr class="detail" data-for="' + esc(s.id) + '" hidden><td colspan="10">' + pathOf(s, d) + "</td></tr>";
     }).join("");
   }
 
