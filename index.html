@@ -2753,7 +2753,24 @@ First ask me which agent I changed. Then copy forward from my last run's folder 
           </div>
         </div>
 
-        <section class="extras" aria-labelledby="ext-title">
+        <div class="note">
+          <span class="note-label">There is one more page</span>
+          <p>The finish line has a few ways to take this further on your own time: running the whole pipeline over a list of targets instead of one, letting the revision loop keep going until the email is actually good enough, and having it learn who you are from your CV and LinkedIn rather than from a file you wrote by hand.</p>
+          <p>Before you go through, please fill in the <a href="https://forms.gle/CdqiFw7oNo99sS8u7" target="_blank" rel="noopener">workshop feedback form</a>. It takes a couple of minutes and it is the main thing that decides what the next run of this workshop looks like.</p>
+        </div>
+
+      </section>
+
+      <section class="step finale" data-finale hidden>
+        <div class="postmark" aria-hidden="true"></div>
+        <header class="step-head">
+          <div class="step-meta"><span class="step-n">Workshop complete</span></div>
+          <h2 tabindex="-1">You built a four-agent pipeline from an empty folder.</h2>
+        </header>
+        <p class="lede">Here's everything you now know:</p>
+        <ul class="learned" id="learned"></ul>
+
+<section class="extras" aria-labelledby="ext-title">
           <h3 id="ext-title">Next steps to try at home</h3>
           <p>None of this is part of the workshop. Each one is a self-contained afternoon, and nothing here is harder than what you have already done.</p>
 
@@ -2768,7 +2785,6 @@ First ask me which agent I changed. Then copy forward from my last run's folder 
               <p>Three things worth watching when you run it. Which parts actually happen in parallel and which quietly do not. What a run costs when it is twenty targets rather than one. And what happens when two targets share a company, since the folder name is built from the company alone.</p>
             </div>
           </details>
-
           <details class="ext">
             <summary><b>Let the loop keep going until the email is good enough</b><span>Quality gate</span></summary>
             <div class="ext-body">
@@ -2782,7 +2798,6 @@ First ask me which agent I changed. Then copy forward from my last run's folder 
               <p>Worth logging every score in the run folder as you go, so you can see whether the loop is converging or just wandering.</p>
             </div>
           </details>
-
           <details class="ext">
             <summary><b>Let it learn who you are from your CV and LinkedIn</b><span>Your own material</span></summary>
             <div class="ext-body">
@@ -2797,55 +2812,8 @@ First ask me which agent I changed. Then copy forward from my last run's folder 
               <p>Your voice samples stay yours either way. A CV tells it what you have done, not how you write.</p>
             </div>
           </details>
-          <details class="ext">
-            <summary><b>Find out whether an instruction you wrote is doing anything</b><span>Ablation</span></summary>
-            <div class="ext-body">
-              <p>Your Writer is told not to invent facts about the company. You believe it works because nothing has gone wrong yet, which is not the same thing. Test it where it would break: give it a brief with almost nothing in it.</p>
-              <p>Make <code>runs/thin-test/01-brief.md</code> in the shape yours produces, holding one vague fact with no date, no number and no source, and leave empty the sections that usually give the Writer something to hold onto. Then run only the Writer against it, writing to <code>runs/thin-test/02-draft-a.md</code>. Count the claims the draft makes about the company, and see how many trace back to your one fact.</p>
-              <p>What you want is an email honest about having little to say. What you often get is one that fills the gap with something plausible.</p>
-              <p>Then the part that makes it an experiment rather than a demonstration. Copy your Writer to <code>.claude/agents/writer-noclause.md</code>, change its <code>name:</code> and <code>description:</code> to match the new filename, take out the one instruction you think is doing the work, and run it over the same brief to <code>runs/thin-test/02-draft-b.md</code>. If both drafts come out the same, the instruction you were proud of was not the thing saving you. Delete the copy afterwards, or you will have two agents describing themselves almost identically for the rest of the session.</p>
-            </div>
-          </details>
-          <details class="ext">
-            <summary><b>Change one agent and measure whether it actually helped</b><span>A/B test</span></summary>
-            <div class="ext-body">
-              <p>"It reads better" is not a result. Run the comparison with the input held still, and you will usually find out something you did not want to know.</p>
-              <p>Hold one brief and one draft fixed, so the Editor is the only thing changing. Copy your Editor to <code>editor-a.md</code> and write <code>editor-b.md</code> with exactly one deliberate difference, changing <code>name:</code> and <code>description:</code> in both to match their filenames. Avoid making that difference a word limit, because judges reward length on their own and you would be measuring the judge instead.</p>
-              <p>Run each one twice over that one draft, into four separate output files. Two runs per version is the least that shows you how noisy the pipeline is when nothing has changed at all.</p>
-              <p>Then judge them somewhere that did not watch you work. Strip the <code>EDITOR'S NOTE:</code> line from all four first, because on a good day it names your manipulation outright. Relabel them X1, X2, Y1, Y2 and hand all four at once, together with the brief and your voice samples, to a fresh session that scores each on hook specificity, voice match and ask clarity. Tell it to ignore the project instructions, because a fresh session in this project still loads <code>CLAUDE.md</code>, which describes the Editor and its job.</p>
-              <p>Then the only question that matters: is the gap between the two versions bigger than the spread inside each of them? Very often it is not, and the honest answer is that the comparison was inconclusive. That is a result, and it is the one most people skip past. If one version did win by more than the spread inside both, copy it over <code>.claude/agents/editor.md</code> and set its <code>name:</code> back to <code>editor</code>, because the manager delegates to the name in the file and never to the filename.</p>
-            </div>
-          </details>
-          <details class="ext">
-            <summary><b>Work out what a run costs, and what the fourth agent added</b><span>Cost</span></summary>
-            <div class="ext-body">
-              <p>Run <code>/usage</code> immediately before a run and immediately again when it finishes, and write down the <code>Total cost</code> figure from the Session block at the top both times. The difference between the two is what that run cost. Neither total on its own tells you anything, and you cannot go back for the first reading once the run has started.</p>
-              <p>Do it once for a run without the Recruiter and once for a run with it, and you have priced the fourth agent. Compare full runs with full runs: a run that reuses an existing brief and draft skips the Researcher and the Writer, so measuring it against a full run mostly prices the two agents that did not run.</p>
-              <p>Two things worth knowing before you trust a number. A run where the revision loop fires carries three more delegations than one where it does not, so check whether the loop fired before you attribute the difference to the Recruiter alone. And the Attribution section lower down the screen will not do this for you: it reports percentages rather than token counts, over the last 24 hours or 7 days across every session on this machine, so by the time you reach it you are looking at an average of everything you have run today.</p>
-              <p>The Session block resets when the session does, so copy each number somewhere outside Claude as you go.</p>
-            </div>
-          </details>
-          <details class="ext">
-            <summary><b>Try to break your own rulebook</b><span>Ten minutes</span></summary>
-            <div class="ext-body">
-              <p>This one needs no runs at all. Open your <code>CLAUDE.md</code> and find two things.</p>
-              <p>First, a rule an agent could follow to the letter while still breaking the pipeline. Rules that describe intent rather than behaviour are usually the ones: an agent can honour every word and still hand the next stage something it cannot use.</p>
-              <p>Second, a rule the manager could obey while quietly doing one of the agents' jobs for it. "The manager does not fix the email itself" is a good place to start, because the manager can leave the file untouched and tidy the copy it prints into the chat, which is the copy you would actually send.</p>
-              <p>Both of these are easier to find than they sound, and finding them tells you more about how these systems fail than another successful run will.</p>
-            </div>
-          </details>
         </section>
 
-      </section>
-
-      <section class="step finale" data-finale hidden>
-        <div class="postmark" aria-hidden="true"></div>
-        <header class="step-head">
-          <div class="step-meta"><span class="step-n">Workshop complete</span></div>
-          <h2 tabindex="-1">You built a four-agent pipeline from an empty folder.</h2>
-        </header>
-        <p class="lede">Here's everything you now know:</p>
-        <ul class="learned" id="learned"></ul>
 
         <section class="feedback" aria-labelledby="fb-title">
           <h3 id="fb-title">How was the workshop?</h3>
@@ -2882,7 +2850,7 @@ First ask me which agent I changed. Then copy forward from my last run's folder 
 <div class="gate-wrap" id="gate" hidden>
   <div class="gate" role="dialog" aria-modal="true" aria-labelledby="gate-title">
     <h2 id="gate-title">One thing before the finish line</h2>
-    <p>Have you filled in the workshop feedback form? It takes a couple of minutes, and it is the main thing that makes the next run of this workshop better than this one.</p>
+    <p>Have you filled in the workshop feedback form? It takes a couple of minutes, and it is the main thing that makes the next run of this workshop better than this one. The finish page is on the other side, with a few ideas for taking this further at home.</p>
     <a class="gate-link" id="gate-form" href="https://forms.gle/CdqiFw7oNo99sS8u7" target="_blank" rel="noopener">Open the feedback form</a>
     <div class="gate-acts">
       <button type="button" class="primary" id="gate-yes">Yes, I have filled out the feedback form</button>
