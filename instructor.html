@@ -419,7 +419,7 @@
 
     <section class="panel span-12" aria-labelledby="h-mix">
       <h2 id="h-mix">How people are working</h2>
-      <p class="sub">Share of students who took Intermediate or Advanced on each step, of those who finished it. Useful for deciding which steps are worth deepening next time.</p>
+      <p class="sub">Share of students who took Challenge on each step, of those who finished it. Useful for deciding which steps are worth deepening next time.</p>
       <div class="rows" id="mix"></div>
     </section>
 
@@ -810,7 +810,7 @@
         return '<span class="pip' + (s.steps[id] ? " on" : "") + '" title="' + esc(TITLES[id] || id) + '"></span>';
       }).join("");
       return "<tr><td>" + esc(s.name) + '</td><td class="email">' + esc(s.email) + "</td>" +
-        "<td>" + esc(LEVEL_LABEL[s.level] || "Beginner") + "</td>" +
+        "<td>" + esc(LEVEL_LABEL[s.level] || "Base") + "</td>" +
         '<td class="num"><span class="pips" aria-hidden="true">' + pips + "</span>" + s.done + "/" + d.steps.length + "</td>" +
         "<td>" + (s.finished ? '<span class="done-tag">✓ finished</span>' : esc(TITLES[s.cur] || s.cur)) + "</td>" +
         '<td class="num">' + ago(s.joinedAt, d.now) + '</td><td class="num">' + ago(s.updatedAt, d.now) + "</td>" +
