@@ -158,16 +158,16 @@
     gap: 18px;
   }
 
-  .tiles { grid-column: 1 / -1; display: grid; grid-template-columns: repeat(5, minmax(0, 1fr)); gap: 12px; }
+  .tiles { grid-column: 1 / -1; display: grid; grid-template-columns: repeat(auto-fit, minmax(128px, 1fr)); gap: 10px; }
 
   .tile {
     background: var(--surface);
     border: 1px solid var(--line);
     border-radius: 12px;
-    padding: 14px 16px 16px;
+    padding: 12px 14px 13px;
     display: flex;
     flex-direction: column;
-    gap: 2px;
+    gap: 1px;
   }
 
   .tile .k { font-family: var(--f-mono); font-size: 11px; letter-spacing: .06em; text-transform: uppercase; color: var(--muted); }
@@ -333,7 +333,14 @@
   .pip.on.chal { background: var(--accent); border-color: var(--accent); }
 
   .pc { font-style: normal; color: var(--muted); font-size: 11.5px; margin-left: 4px; }
+  th.mark, td.mark { text-align: center; padding-left: 8px; padding-right: 8px; white-space: nowrap; }
+  td.mark { font-size: 14px; line-height: 1; }
   .fill.alt { background: var(--accent); }
+  .fill.seg-base { background: var(--bar); border-radius: 0; }
+  .fill.seg-chal { background: var(--accent); border-radius: 0 4px 4px 0; }
+  .fill.seg-base.only { border-radius: 0 4px 4px 0; }
+  .sw-base { width: 14px; height: 10px; border-radius: 2px; background: var(--bar); }
+  .sw-chal { width: 14px; height: 10px; border-radius: 2px; background: var(--accent); }
   .ack { color: var(--done); }
   .back { color: var(--accent); }
 
@@ -426,7 +433,7 @@
     </section>
     <section class="panel span-5" aria-labelledby="h-mix">
       <h2 id="h-mix">Base and Challenge</h2>
-      <p class="sub">Only the three steps where the two tracks differ. The bar is Challenge; the numbers read Base % / Challenge %, of whoever finished that step.</p>
+      <p class="sub">Only the three steps where the two tracks differ. Each bar is split by how the students who finished that step did it. Switcher bars show the share of that track who crossed over.</p>
       <div class="rows" id="mix"></div>
     </section>
 
@@ -451,7 +458,7 @@
       </div>
       <div class="table-wrap">
         <table>
-          <thead><tr><th>Name</th><th>Email</th><th>Track</th><th>Progress</th><th>Current step</th><th>Form</th><th>Came back</th><th>Joined</th><th>Last active</th><th>Rating</th></tr></thead>
+          <thead><tr><th>Name</th><th>Email</th><th>Track</th><th>Progress</th><th>Current step</th><th class="mark">Form</th><th class="mark">Came back</th><th>Joined</th><th>Last active</th><th>Rating</th></tr></thead>
           <tbody id="students"></tbody>
         </table>
       </div>
@@ -741,9 +748,15 @@
       var tip = took.length
         ? (TITLES[id] || id) + ": " + base + " Base (" + Math.round(100 - pct) + "%), " + chal + " Challenge (" + Math.round(pct) + "%), of " + took.length + " who finished it"
         : (TITLES[id] || id) + ": nobody has finished it yet";
+      var basePct = 100 - pct;
+      var segs = "";
+      if (took.length) {
+        if (basePct > 0) segs += '<span class="fill seg-base' + (pct > 0 ? "" : " only") + '" style="width:' + basePct + '%"></span>';
+        if (pct > 0) segs += '<span class="fill seg-chal" style="left:' + basePct + '%;width:' + pct + '%"></span>';
+      }
       return '<div class="row"><span class="lab">' + label(id) + "</span>" +
-        '<div class="track" data-tip="' + esc(tip) + '"><span class="fill" style="width:' + pct + '%"></span></div>' +
-        '<span class="val">' + (took.length ? Math.round(100 - pct) + "% / " + Math.round(pct) + "%" : "") + "</span></div>";
+        '<div class="track" data-tip="' + esc(tip) + '">' + segs + "</div>" +
+        '<span class="val">' + (took.length ? Math.round(basePct) + "% / " + Math.round(pct) + "%" : "") + "</span></div>";
     }).join("");
 
     /* A switch is a choice step finished on the other track from the one they
@@ -769,7 +782,7 @@
       '<p class="sub" style="padding-top:10px;padding-bottom:2px">Switchers</p>' +
       sw("Base \u2192 Challenge", upCount, onBase.length, "Students set to Base who took Challenge on at least one step") +
       sw("Challenge \u2192 Base", downCount, onChal.length, "Students set to Challenge who dropped to Base on at least one step") +
-      '<p class="sub" style="padding-top:8px">Bars read Challenge. Percentages are of the students who finished that step.</p>';
+      '<p class="legend" style="padding-top:10px"><span><i class="sw-base"></i>Base</span><span><i class="sw-chal"></i>Challenge</span></p>';
   }
 
 
@@ -817,8 +830,8 @@
         "<td>" + split + "</td>" +
         '<td class="num"><span class="pips" aria-hidden="true">' + pips + "</span>" + s.done + "/" + d.steps.length + "</td>" +
         "<td>" + (s.finished ? '<span class="done-tag">✓ finished</span>' : esc(TITLES[s.cur] || s.cur)) + "</td>" +
-        '<td>' + (s.ack ? '<span class="ack">✓</span>' : "") + "</td>" +
-        '<td>' + (s.cameBack ? '<span class="back">✓</span>' : "") + "</td>" +
+        '<td class="mark">' + (s.ack ? '<span class="ack">✓</span>' : "") + "</td>" +
+        '<td class="mark">' + (s.cameBack ? '<span class="back">✓</span>' : "") + "</td>" +
         '<td class="num">' + ago(s.joinedAt, d.now) + '</td><td class="num">' + ago(s.updatedAt, d.now) + "</td>" +
         '<td class="num">' + (s.fb ? "★ " + s.fb.rating : "") + "</td></tr>" +
         '<tr class="detail" data-for="' + esc(s.id) + '" hidden><td colspan="10">' + pathOf(s, d) + "</td></tr>";
