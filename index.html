@@ -2517,7 +2517,7 @@ When you have it all, write both files, keep the headings exactly as they are, a
         </header>
         <p class="lede">The agents can't start themselves. Someone has to call them in the right order and hand each one the right files. That's the manager's job, and the manager is your main Claude Code session, the one you're typing into.</p>
         <p>You give the manager its instructions with the <strong>run prompt</strong>. Type your real top target into the card, then copy the prompt and paste it into Claude:</p>
-        <p><strong>Person is optional.</strong> Fill it in if you know who should receive this, and the Writer will greet them by name. Leave it blank and the email opens with a bare <code>Hi,</code> for you to complete before you send. With a person the prompt's first line reads <code>Company | Role | Person</code>; without one it is just <code>Company | Role</code>.</p>
+        <p><strong>Person is optional.</strong> Leave it blank and the email opens with a bare <code>Hi,</code> for you to complete before you send.</p>
         <div class="files" data-run></div>
         <div class="note">
           <span class="note-label">Read it before you paste</span>
@@ -2527,11 +2527,9 @@ When you have it all, write both files, keep the headings exactly as they are, a
           <span class="note-label">What to expect while it runs</span>
           <p>Two to five minutes. The Researcher is the slow part, because it is doing real web searches, and long gaps with nothing on screen are normal. You will see three rows appear in the transcript, labelled <code>researcher</code>, <code>writer</code> and <code>editor</code>, each finishing with a single sentence.</p>
           <p><strong>If Claude says it has no <code>researcher</code> subagent</strong>, the restart in Step 04 did not take. Go back and run the check prompt there.</p>
-          <p><strong>Claude should pass over the recruiter without a word</strong>, because the run prompt tells it to. If it mentions one is missing anyway, nothing is wrong: there is a fourth agent you add later, and the prompt works whether or not it exists yet.</p>
           <p><strong>If the brief comes back with one or two facts</strong>, that is the Researcher being honest rather than inventing, and your email will be shorter because of it. Open <code>01-brief.md</code> and see what it could not verify.</p>
           <p><strong>If nothing has happened for five minutes</strong>, paste: <em>Where are you in the pipeline, and which file are you waiting on?</em></p>
         </div>
-        <p>Watch the transcript while it runs. Each delegation appears as its own row labelled with the subagent's name: three agents, three separate contexts, three jobs.</p>
         <p>When it finishes, open the run's folder (<code>runs/stripe/</code> if your company is Stripe) and read all three files <strong>in order</strong>:</p>
         <ol class="list">
           <li><code>01-brief.md</code>: what the Researcher found</li>
@@ -2542,7 +2540,7 @@ When you have it all, write both files, keep the headings exactly as they are, a
         <div class="note">
           <span class="note-label">Two things about that final file</span>
           <p><code>03-final.md</code> ends with <code>EDITOR'S NOTE:</code>, one line on what the Editor changed. That is for you, not the recipient. Do not paste it into your email.</p>
-          <p>If you left Person blank, the email starts <code>Hi,</code> with nothing after it. Nothing in this pipeline goes looking for a human. Finding the right person, and deciding they are worth the ask, is the part worth not automating.</p>
+          <p>Nothing in this pipeline goes looking for a human. Finding the right person, and deciding they are worth the ask, is the part worth not automating.</p>
         </div>
         <div class="ask">
           <span class="mono-label">Question to sit with</span>
