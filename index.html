@@ -2614,7 +2614,7 @@ First ask me which agent I changed. Then copy forward from my last run's folder 
         <p class="lede">A recruiter who gets forty cold emails a week and replies to two. Add a fourth agent file alongside the first three:</p>
         <div class="note">
           <span class="note-label">No restart this time</span>
-          <p><code>.claude/agents/</code> already exists, so Claude Code notices <code>recruiter.md</code> within seconds of you creating it. Step 04 needed a restart because the folder itself was new. That is the difference it was teaching you, and you are on the other side of it now.</p>
+          <p><code>.claude/agents/</code> already exists, so Claude Code notices <code>recruiter.md</code> within seconds of you creating it.</p>
           <p>If Claude does say it cannot find a <code>recruiter</code> subagent, run the check prompt from Step 04. If the recruiter is missing from that list, restart Claude Code the way Step 04 describes and it will be there.</p>
         </div>
         
@@ -2625,19 +2625,16 @@ First ask me which agent I changed. Then copy forward from my last run's folder 
 
 
 
-        <p>This round writes to its own folder, and which number it gets depends on how many pipeline runs you have done. Read the name Claude gives you when it finishes rather than predicting it. Both verdicts are in there.</p>
+        <p>This round writes to its own folder. Read the name Claude gives you when it finishes rather than predicting it.</p>
         <p>The Recruiter scores the final email out of 10. Under 8 sends it back to the Writer for exactly one revision, then the Editor, then the Recruiter scores it again. Read both verdicts:</p>
         <ol class="list">
           <li><code>04-review.md</code>: the first score and its objections</li>
           <li><code>04-review-v2.md</code>: the score after one revision</li>
         </ol>
         <div class="note">
-          <span class="note-label">Ending on "would reply: no" is a normal result</span>
+          <span class="note-label">Whatever number you end on</span>
           <p>One loop is all the pipeline gets, even if the second score is still under 8. Finishing at 6 or 7 is not a broken run, and what the loop could not fix is the interesting part.</p>
-        </div>
-        <div class="note">
-          <span class="note-label">No second file?</span>
-          <p>Then your first score was 8 or higher and the loop never fired, which is the one case this round has nothing to show you. That is a good outcome, not a mistake. To see the loop anyway, run it once more with Person left blank: the missing name usually costs enough to trigger it.</p>
+          <p>If there is no second file at all, your first score was 8 or higher and the loop never fired, which is the one case this round has nothing to show you. To see it anyway, run once more with Person left blank: the missing name usually costs enough to trigger it.</p>
         </div>
         <div class="note">
           <span class="note-label">If you left Person blank</span>
