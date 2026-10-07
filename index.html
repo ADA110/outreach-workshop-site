@@ -675,6 +675,57 @@
 
   .stuck-btn { flex: none; }
 
+  /* The feedback form, reachable from every screen. */
+  .fb-btn {
+    flex: none;
+    font-family: var(--f-body);
+    font-size: 13px;
+    font-weight: 500;
+    text-decoration: none;
+    color: var(--accent-ink);
+    background: var(--accent-soft);
+    border: 1px solid var(--accent);
+    border-radius: 6px;
+    padding: 5px 11px;
+    white-space: nowrap;
+    transition: background .15s ease, border-color .15s ease;
+  }
+  .fb-btn:hover { background: var(--accent); color: var(--ground); }
+
+  /* The one gate in the workshop: the finish line waits on the form. */
+  .gate-wrap {
+    position: fixed;
+    inset: 0;
+    z-index: 90;
+    background: rgba(10, 16, 22, .55);
+    display: grid;
+    place-items: center;
+    padding: 24px;
+  }
+
+  .gate {
+    width: min(480px, 100%);
+    background: var(--surface);
+    border: 1px solid var(--line-strong);
+    border-radius: 12px;
+    box-shadow: 0 18px 50px rgba(10, 16, 22, .3);
+    padding: 26px 26px 22px;
+  }
+
+  .gate h2 {
+    font-family: var(--f-display);
+    font-size: 21px;
+    font-weight: 700;
+    letter-spacing: -.015em;
+    margin: 0 0 10px;
+  }
+
+  .gate p { margin: 0 0 14px; font-size: 14px; line-height: 1.55; color: var(--ink-2); }
+  .gate .gate-link { display: inline-block; margin-bottom: 18px; font-size: 14px; }
+  .gate-acts { display: flex; flex-wrap: wrap; gap: 10px; align-items: center; }
+  .gate-acts button.primary { background: var(--accent); border-color: var(--accent); color: var(--ground); }
+  .gate-acts button.primary:hover { border-color: var(--accent-ink); }
+
   /* segmented progress */
 
   .segs { display: flex; gap: 4px; }
@@ -2064,6 +2115,7 @@
           <option value="challenge">Challenge</option>
         </select>
       </label>
+      <a class="fb-btn" id="fb-link" href="https://forms.gle/CdqiFw7oNo99sS8u7" target="_blank" rel="noopener">Feedback form</a>
       <button type="button" class="stuck-btn" id="stuck-open">Stuck?</button>
       </div>
       <div class="segs" id="segs" role="list" aria-label="Progress"></div>
@@ -2798,6 +2850,7 @@ First ask me which agent I changed. Then copy forward from my last run's folder 
         <section class="feedback" aria-labelledby="fb-title">
           <h3 id="fb-title">How was the workshop?</h3>
           <p>Your rating and comments go straight to your instructor. Nobody else sees them.</p>
+          <p>There is also a <a href="https://forms.gle/CdqiFw7oNo99sS8u7" target="_blank" rel="noopener">workshop feedback form</a>, which is the one that shapes how this gets run next time. It stays in the bar at the top of the page if you want to come back to it.</p>
           <div class="stars" id="stars" role="radiogroup" aria-label="Rating out of 5"></div>
           <p class="star-word" id="star-word">Pick a rating</p>
           <label class="field">
@@ -2824,6 +2877,19 @@ First ask me which agent I changed. Then copy forward from my last run's folder 
     <button type="button" class="linkish" id="reset" hidden>Start over</button>
   </div>
 </footer>
+
+<!-- feedback gate, shown once before the finish line -->
+<div class="gate-wrap" id="gate" hidden>
+  <div class="gate" role="dialog" aria-modal="true" aria-labelledby="gate-title">
+    <h2 id="gate-title">One thing before the finish line</h2>
+    <p>Have you filled in the workshop feedback form? It takes a couple of minutes, and it is the main thing that makes the next run of this workshop better than this one.</p>
+    <a class="gate-link" id="gate-form" href="https://forms.gle/CdqiFw7oNo99sS8u7" target="_blank" rel="noopener">Open the feedback form</a>
+    <div class="gate-acts">
+      <button type="button" class="primary" id="gate-yes">Yes, I have filled out the feedback form</button>
+      <button type="button" id="gate-back">Not yet</button>
+    </div>
+  </div>
+</div>
 
 <!-- stuck drawer -->
 <div class="drawer-wrap" id="drawer" hidden>
@@ -3195,7 +3261,7 @@ Sam
   var LEVELS = ["base", "challenge"];
   var LEVEL_LABEL = { base: "Base", challenge: "Challenge" };
 
-  var state = { name: "", email: "", steps: {}, company: "", role: "", person: "", feedback: null, level: "base", tabs: {}, levels: {} };
+  var state = { name: "", email: "", steps: {}, company: "", role: "", person: "", feedback: null, level: "base", tabs: {}, levels: {}, feedbackAck: false };
   var TITLES = {};
   var saveTimer = null;
   var syncOff = false;
@@ -3220,6 +3286,7 @@ Sam
           state.level = LEVELS.indexOf(p.level) >= 0 ? p.level : "base";
           state.tabs = p.tabs && typeof p.tabs === "object" ? p.tabs : {};
           state.levels = p.levels && typeof p.levels === "object" ? p.levels : {};
+          state.feedbackAck = p.feedbackAck === true;
         }
       }
     } catch (e) { /* private window or blocked storage */ }
@@ -4112,6 +4179,12 @@ Sam
   }
 
   function show(id) {
+    /* Returning with everything finished lands here, so the gate has to hold
+       this door too, not just the ones you walk through during the session. */
+    if (id === "finale" && !state.feedbackAck) {
+      openGate(function () { show("finale"); });
+      id = STEPS[STEPS.length - 1];
+    }
     var el = elOf(id);
     if (id === "finale") stampFinale();
     STEPS.forEach(function (s) { sections[s].hidden = true; });
@@ -4124,6 +4197,7 @@ Sam
   /** Revisit any reachable step: a quick crossfade, no ceremony. */
   function go(id) {
     if (busy || id === viewing || !reachable(id)) return;
+    if (id === "finale" && !state.feedbackAck) { openGate(function () { go(id); }); return; }
     busy = true;
     var from = viewing ? elOf(viewing) : null;
     var to = elOf(id);
@@ -4154,6 +4228,7 @@ Sam
   /** Finish the current step: stamp it, send it off, open the next one. */
   function completeStep(id) {
     if (busy || isDone(id)) return;
+    if (!state.feedbackAck && opensFinale(id)) { openGate(function () { completeStep(id); }); return; }
     busy = true;
 
     var sec = sections[id];
@@ -4323,6 +4398,46 @@ Sam
   /* ---------- stuck drawer ---------- */
 
   var drawer = $("#drawer");
+
+  /* The finish line waits on the feedback form. Everything else is open. */
+  var gateEl = $("#gate");
+  var gateThen = null;
+  var gateLast = null;
+
+  function openGate(after) {
+    gateThen = typeof after === "function" ? after : null;
+    gateLast = document.activeElement;
+    gateEl.hidden = false;
+    $("#gate-yes").focus();
+  }
+
+  function closeGate() {
+    gateEl.hidden = true;
+    gateThen = null;
+    if (gateLast && gateLast.focus) gateLast.focus();
+  }
+
+  $("#gate-yes").addEventListener("click", function () {
+    state.feedbackAck = true;
+    save();
+    var after = gateThen;
+    gateEl.hidden = true;
+    gateThen = null;
+    if (after) after();
+  });
+
+  $("#gate-back").addEventListener("click", closeGate);
+
+  gateEl.addEventListener("click", function (e) { if (e.target === gateEl) closeGate(); });
+
+  document.addEventListener("keydown", function (e) {
+    if (e.key === "Escape" && !gateEl.hidden) closeGate();
+  });
+
+  /* True when finishing this step is the thing that opens the finish line. */
+  function opensFinale(id) {
+    return STEPS.every(function (s) { return s === id || isDone(s); });
+  }
 
   function openDrawer() {
     drawer.hidden = false;
