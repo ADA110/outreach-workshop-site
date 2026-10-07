@@ -4365,6 +4365,7 @@ Sam
     state.steps = {};
     state.tabs = {};
     state.levels = {};
+    state.feedbackAck = false;
     saveLocal();
     pushRemote().then(function () { location.reload(); });
   });
