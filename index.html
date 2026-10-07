@@ -2307,13 +2307,11 @@
         </ul>
         <div class="note">
           <span class="note-label">Set your model to Sonnet</span>
-          <p><strong>Before you start, switch your main Claude Code session to Sonnet</strong>, using the model dropdown next to the send button, or by typing <code>/model</code> and choosing Sonnet from the list. Nothing in this workshop needs a bigger model, and a bigger one will eat through your usage limits well before the last round.</p>
-          <p>The agents you are about to build run on Sonnet too. Every agent file carries the line <code>model: sonnet</code>, so the Researcher, the Writer, the Editor and the Recruiter all use it whatever your session is set to. Choosing Sonnet now means the whole pipeline, manager and agents alike, is running the same model.</p>
+          <p>Use the model dropdown next to the send button. Nothing here needs a bigger model, and a bigger one will eat your usage limits before the end.</p>
         </div>
         <div class="note">
-          <span class="note-label">Set your permission mode to Accept Edits</span>
-          <p>It sits in the same row as the model picker. You are about to create around ten files, and this mode lets Claude write them without stopping to ask each time.</p>
-          <p>Auto mode is the one to avoid here. It will refuse to create the permissions file two steps from now, because that file decides what Claude is allowed to do, and a mode that approves on your behalf will not let Claude widen its own powers. That is the right call by Claude, and it leaves you stuck.</p>
+          <span class="note-label">Set your permission mode to Auto</span>
+          <p>Same row as the model picker. You are about to create around ten files, five of them inside <code>.claude/</code>, which is a protected folder: every other mode stops and asks you each time something goes in there. If Auto does ask about something, approve it.</p>
         </div>
         <p>There's nothing to download for this workshop. You'll build every file yourself, from this page.</p>
       </section>
@@ -2323,13 +2321,9 @@
           <div class="step-meta"><span class="step-n">Step 01</span></div>
           <h2 tabindex="-1">Make the folder and open it</h2>
         </header>
-        <p class="lede">Make a new, empty folder somewhere you can find again (Desktop or Documents is fine) and name it exactly:</p>
+        <p class="lede">Make a folder on your Desktop, named exactly:</p>
         <div class="cmd">agents-outreach-team</div>
         <p>Then in the Claude desktop app, go to the <strong>Code</strong> tab and open that folder as your project. When you're asked whether to trust the folder, say <strong>yes</strong>.</p>
-        <div class="note">
-          <span class="note-label">Why an empty folder</span>
-          <p>Claude Code works inside one project folder at a time. It needs somewhere to stand before it can create anything, which is why the folder comes first and the files come second.</p>
-        </div>
       </section>
 
       <section class="step" data-step="base" data-label="Step 02" data-title="The rules and permissions" hidden>
@@ -2353,9 +2347,8 @@
 
 
         <div class="note">
-          <span class="note-label">You should not be asked to approve these</span>
-          <p>You set Accept Edits before you started, so Claude creates both files without stopping. Everything after this, the agent files, your own files and the run output, is covered by the allow list you are creating right now.</p>
-          <p>If Claude does stop and tells you it cannot grant itself permissions, you are in auto mode. Switch to Accept Edits, in the same row as the model picker, and paste the prompt again.</p>
+          <span class="note-label">If Claude asks before writing</span>
+          <p><code>.claude/</code> is a protected folder, so anything written there is checked rather than waved through, whatever mode you are in. Approve it and carry on.</p>
         </div>
         <div class="ask">
           <span class="mono-label">Read it before you move on</span>
