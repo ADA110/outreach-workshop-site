@@ -2175,8 +2175,8 @@
         <p class="lede">You'll build a small team of AI agents in Claude Code, then use it to write a real cold email. The email is the project. The agents are what you're here to learn.</p>
 
         <div class="note">
-          <span class="note-label">Two things about how this works</span>
-          <p>Every step is the same for everyone. The only thing your track changes is the file cards: on Base each one is written out for you, and on Challenge you get a short brief of what the file has to do and write it yourself, with ours behind a reveal on the card whenever you want it. Switch between them at the top at any point, including halfway through a file. Nobody is expected to finish in the session, and your progress is saved, so carrying on afterwards is the normal outcome rather than a failure.</p>
+          <span class="note-label">Base or Challenge</span>
+          <p>Base writes every file out for you. Challenge gives you a brief and keeps ours behind a reveal on the card. Switch at the top, or on any step that offers it. Your progress saves, so finishing later is normal.</p>
         </div>
 
         <section class="ov" aria-labelledby="ov-team">
@@ -2218,45 +2218,6 @@
           </div>
         </section>
 
-        <section class="ov" aria-labelledby="ov-notes">
-          <h3 id="ov-notes">How the agents hand off work</h3>
-          <p>The agents never talk to each other. Each one does its job, then writes a Markdown (<code>.md</code>) file: a note for the next agent to pick up. That note is the handoff.</p>
-          <ol class="relay">
-            <li class="relay-step">
-              <div class="relay-row">
-                <span class="agent" style="--c: var(--ag-researcher)">researcher</span>
-                <span class="relay-verb" aria-hidden="true">writes</span>
-                <span class="memo"><code>01-brief.md</code><small>The brief: 3 to 5 dated facts about the company</small></span>
-              </div>
-              <p class="relay-next">The Writer reads the brief</p>
-            </li>
-            <li class="relay-step">
-              <div class="relay-row">
-                <span class="agent" style="--c: var(--ag-writer)">writer</span>
-                <span class="relay-verb" aria-hidden="true">writes</span>
-                <span class="memo"><code>02-draft.md</code><small>The draft: a first version of the email</small></span>
-              </div>
-              <p class="relay-next">The Editor reads the draft, checking it against the brief</p>
-            </li>
-            <li class="relay-step">
-              <div class="relay-row">
-                <span class="agent" style="--c: var(--ag-editor)">editor</span>
-                <span class="relay-verb" aria-hidden="true">writes</span>
-                <span class="memo"><code>03-final.md</code><small>The final email, cut down and in your voice</small></span>
-              </div>
-              <p class="relay-next">You read the final, and from Step 08 so does the Recruiter</p>
-            </li>
-            <li class="relay-step later">
-              <div class="relay-row">
-                <span class="agent" style="--c: var(--ag-recruiter)">recruiter</span>
-                <span class="relay-verb" aria-hidden="true">writes</span>
-                <span class="memo"><code>04-review.md</code><small>The review: a score out of 10 and what to fix</small></span>
-              </div>
-              <p class="relay-next">A score under 8 sends it back to the Writer for one more pass</p>
-            </li>
-          </ol>
-          <p>Every note lands in <code>runs/&lt;company&gt;/</code>. After a run, open them in order and you'll see exactly what each agent was handed and what it passed on.</p>
-        </section>
 
         <section class="ov" aria-labelledby="ov-run">
           <div class="ov-head">
@@ -2320,89 +2281,9 @@
           </div>
         </section>
 
-        <section class="ov" aria-labelledby="ov-see">
-          <h3 id="ov-see">Who sees what</h3>
-          <p>Each agent starts fresh and sees only what it's handed. That keeps each one focused, and it means you can trace any sentence in the email back to a file.</p>
-          <div class="matrix-wrap">
-            <table class="matrix">
-              <thead>
-                <tr>
-                  <th scope="col"><span class="sr-only">Agent</span></th>
-                  <th scope="col">the web</th>
-                  <th scope="col">01-brief</th>
-                  <th scope="col">background</th>
-                  <th scope="col">voice samples</th>
-                  <th scope="col">02-draft</th>
-                  <th scope="col">03-final</th>
-                </tr>
-              </thead>
-              <tbody>
-                <tr>
-                  <th scope="row"><span class="agent" style="--c: var(--ag-researcher)">researcher</span></th>
-                  <td class="y">&#10003;<span class="sr-only">sees</span></td><td><span class="sr-only">no</span></td><td><span class="sr-only">no</span></td><td><span class="sr-only">no</span></td><td><span class="sr-only">no</span></td><td><span class="sr-only">no</span></td>
-                </tr>
-                <tr>
-                  <th scope="row"><span class="agent" style="--c: var(--ag-writer)">writer</span></th>
-                  <td><span class="sr-only">no</span></td><td class="y">&#10003;<span class="sr-only">sees</span></td><td class="y">&#10003;<span class="sr-only">sees</span></td><td><span class="sr-only">no</span></td><td><span class="sr-only">no</span></td><td><span class="sr-only">no</span></td>
-                </tr>
-                <tr>
-                  <th scope="row"><span class="agent" style="--c: var(--ag-editor)">editor</span></th>
-                  <td><span class="sr-only">no</span></td><td class="y">&#10003;<span class="sr-only">sees</span></td><td><span class="sr-only">no</span></td><td class="y">&#10003;<span class="sr-only">sees</span></td><td class="y">&#10003;<span class="sr-only">sees</span></td><td><span class="sr-only">no</span></td>
-                </tr>
-                <tr>
-                  <th scope="row"><span class="agent" style="--c: var(--ag-recruiter)">recruiter</span></th>
-                  <td><span class="sr-only">no</span></td><td class="y">&#10003;<span class="sr-only">sees</span></td><td><span class="sr-only">no</span></td><td><span class="sr-only">no</span></td><td><span class="sr-only">no</span></td><td class="y">&#10003;<span class="sr-only">sees</span></td>
-                </tr>
-              </tbody>
-            </table>
-          </div>
-          <p class="matrix-note">Only the Researcher touches the web. The Writer never sees your voice samples, and the Editor never sees your background.</p>
-        </section>
 
-        <section class="ov" aria-labelledby="ov-why">
-          <h3 id="ov-why">Why build it this way</h3>
-          <p>Cold outreach makes a good first agent project. The job splits into clear steps, each step needs different information, and you can judge the result yourself.</p>
-          <div class="why">
-            <div class="why-card">
-              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="8"/><circle cx="12" cy="12" r="3"/></svg>
-              <b>One job per agent</b>
-              <p>Each agent gets a short, focused prompt and only the tools that job needs. When something goes wrong, you know whose prompt to fix.</p>
-            </div>
-            <div class="why-card">
-              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M7 3h7l4 4v14H7z"/><path d="M14 3v4h4"/><path d="M10 12h5M10 16h5"/></svg>
-              <b>Handoffs you can read</b>
-              <p>Every step writes a file. Open any of them and you'll see exactly what the next agent was given.</p>
-            </div>
-            <div class="why-card">
-              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 3 3 10.5l7 2.5 2.5 7z"/><path d="m10 13 4-4"/></svg>
-              <b>You stay in charge</b>
-              <p>The agents only draft. You review every email and send it yourself.</p>
-            </div>
-          </div>
-        </section>
 
-        <section class="ov" aria-labelledby="ov-learn">
-          <h3 id="ov-learn">What you'll learn as you build</h3>
-          <ol class="phases">
-            <li class="ms"><span class="ph-when">Steps 01 to 05</span><b>Build the team</b><p>What an agent is: a prompt plus a set of tools, in one file. How Claude Code loads agents, and why you'll restart once.</p></li>
-            <li class="ms"><span class="ph-when">Step 06</span><b>Run it</b><p>How your main session hands out work, and how agents pass it along through files.</p></li>
-            <li><span class="ph-when">Step 07</span><b>Tweak it</b><p>How a small change to one agent moves the email, and every agent after it.</p></li>
-            <li class="ms"><span class="ph-when">Step 08</span><b>Grow it</b><p>How to add an agent without rewriting the rest.</p></li>
-            <li class="ms"><span class="ph-when">Debrief</span><b>Look back</b><p>Where you'd split or merge agents, and which ones could run on a cheaper model.</p></li>
-          </ol>
-          <p class="ms-legend"><svg class="cp-key" viewBox="0 0 16 16" aria-hidden="true" focusable="false"><circle cx="8" cy="8" r="6.6"/><path d="M8 4.4 8.94 6.71 11.42 6.89 9.52 8.49 10.12 10.91 8 9.6 5.88 10.91 6.48 8.49 4.58 6.89 7.06 6.71Z"/></svg><span>Checkpoint. Finishing one of these sets off confetti.</span></p>
-        </section>
 
-        <section class="ov" aria-labelledby="ov-leave">
-          <div class="outcome build">
-            <h3 id="ov-leave">What you'll leave with</h3>
-            <ul class="ticklist">
-              <li>Your own <code>agents-outreach-team</code> folder: four agents you built and can keep using</li>
-              <li>A cold email draft for your top target, ready for you to review and send</li>
-              <li>A pattern you can reuse for other multi-step work</li>
-            </ul>
-          </div>
-        </section>
 
         <section class="ov rules" aria-labelledby="ov-rules">
           <h3 id="ov-rules">House rules</h3>
@@ -2590,6 +2471,46 @@ When you have it all, write both files, keep the headings exactly as they are, a
           <p>To use one: press Copy, paste it into Claude, and say which file it belongs in. Download saves it to your downloads folder rather than your project, so it is the slower route.</p>
         </div>
         <div class="files" data-files="samples"></div>
+
+        <section class="ov" aria-labelledby="ov-see">
+          <h3 id="ov-see">Who sees what</h3>
+          <p>Each agent starts fresh and sees only what it's handed. That keeps each one focused, and it means you can trace any sentence in the email back to a file.</p>
+          <div class="matrix-wrap">
+            <table class="matrix">
+              <thead>
+                <tr>
+                  <th scope="col"><span class="sr-only">Agent</span></th>
+                  <th scope="col">the web</th>
+                  <th scope="col">01-brief</th>
+                  <th scope="col">background</th>
+                  <th scope="col">voice samples</th>
+                  <th scope="col">02-draft</th>
+                  <th scope="col">03-final</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <th scope="row"><span class="agent" style="--c: var(--ag-researcher)">researcher</span></th>
+                  <td class="y">&#10003;<span class="sr-only">sees</span></td><td><span class="sr-only">no</span></td><td><span class="sr-only">no</span></td><td><span class="sr-only">no</span></td><td><span class="sr-only">no</span></td><td><span class="sr-only">no</span></td>
+                </tr>
+                <tr>
+                  <th scope="row"><span class="agent" style="--c: var(--ag-writer)">writer</span></th>
+                  <td><span class="sr-only">no</span></td><td class="y">&#10003;<span class="sr-only">sees</span></td><td class="y">&#10003;<span class="sr-only">sees</span></td><td><span class="sr-only">no</span></td><td><span class="sr-only">no</span></td><td><span class="sr-only">no</span></td>
+                </tr>
+                <tr>
+                  <th scope="row"><span class="agent" style="--c: var(--ag-editor)">editor</span></th>
+                  <td><span class="sr-only">no</span></td><td class="y">&#10003;<span class="sr-only">sees</span></td><td><span class="sr-only">no</span></td><td class="y">&#10003;<span class="sr-only">sees</span></td><td class="y">&#10003;<span class="sr-only">sees</span></td><td><span class="sr-only">no</span></td>
+                </tr>
+                <tr>
+                  <th scope="row"><span class="agent" style="--c: var(--ag-recruiter)">recruiter</span></th>
+                  <td><span class="sr-only">no</span></td><td class="y">&#10003;<span class="sr-only">sees</span></td><td><span class="sr-only">no</span></td><td><span class="sr-only">no</span></td><td><span class="sr-only">no</span></td><td class="y">&#10003;<span class="sr-only">sees</span></td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+          <p class="matrix-note">Only the Researcher touches the web. The Writer never sees your voice samples, and the Editor never sees your background.</p>
+        </section>
+
         <div class="ask">
           <span class="mono-label">Question to sit with</span>
           <p class="ask-q">If you left these files empty, the pipeline would still produce an email. What exactly would be wrong with it?</p>
