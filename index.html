@@ -2641,7 +2641,9 @@ First ask me which agent I changed. Then copy forward from my last run's folder 
         <div class="note">
           <span class="note-label">Restart again before you run</span>
           <p>A new agent file does not load into a session that is already open, so quit Claude completely and open it again, exactly the way you did in Step 04. Closing the window is not enough.</p>
-          <p>Back in, you can check it took: ask Claude to <em>list the subagents you can delegate to right now, without opening any files</em>, and look for <code>recruiter</code>.</p>
+          <p>Once you are back in, check it loaded before you run anything. Same prompt as Step 04:</p>
+          <div class="cmd">Without opening any files, list the subagents you can delegate to right now. For each one, give its description and the exact tools it is allowed to use.</div>
+          <p>You are looking for four of your own now: <code>researcher</code>, <code>writer</code>, <code>editor</code> and <code>recruiter</code>. If <code>recruiter</code> is missing, or Claude offers to read the files instead of answering, the restart did not take. Quit again, checking this time that the application has really stopped, and open it once more.</p>
         </div>
           <p>Then paste the run prompt once more, same target. This is a full run, so the Researcher searches again and you get a fresh brief. That is fine, and it is why this round takes about as long as Step 06 did.</p>
           <div class="files" data-run></div>
