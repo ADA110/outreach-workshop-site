@@ -5,7 +5,8 @@ import {
 /**
  * Everything the instructor dashboard shows, for one room.
  *
- *   GET /api/instructor?room=default   header: x-instructor-key: <INSTRUCTOR_KEY>
+ *   GET    /api/instructor?room=default   header: x-instructor-key: <INSTRUCTOR_KEY>
+ *   DELETE /api/instructor?room=default   same header, empties that room
  *
  * The only endpoint that returns student data (names, emails, progress,
  * feedback), so it refuses every request without the key. With no key
@@ -14,8 +15,8 @@ import {
 export default async function handler(req, res) {
   res.setHeader("Cache-Control", "no-store");
 
-  if (req.method !== "GET") {
-    res.setHeader("Allow", "GET");
+  if (req.method !== "GET" && req.method !== "DELETE") {
+    res.setHeader("Allow", "GET, DELETE");
     return res.status(405).json({ ok: false, error: "method_not_allowed" });
   }
 
@@ -35,6 +36,18 @@ export default async function handler(req, res) {
   if (!db) return;
 
   const room = cleanRoom(req.query?.room);
+
+  /* Emptying a room throws away every student record and every piece of
+     feedback in it, and there is no undo. Only the instructor key gets here. */
+  if (req.method === "DELETE") {
+    try {
+      await Promise.all([db.del(keys.students(room)), db.del(keys.feedback(room))]);
+      return res.status(200).json({ ok: true, room, cleared: true });
+    } catch (err) {
+      console.error("instructor reset failed", err);
+      return res.status(500).json({ ok: false, error: "server_error", message: "Could not clear the room." });
+    }
+  }
 
   try {
     const [rawStudents, rawFeedback] = await Promise.all([
