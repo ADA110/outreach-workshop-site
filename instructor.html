@@ -338,6 +338,12 @@
   .pip.on.chal { background: var(--accent); border-color: var(--accent); }
 
   .pc { font-style: normal; color: var(--muted); font-size: 11.5px; margin-left: 4px; }
+  .gate .hint { font-family: var(--f-mono); font-size: 12px; color: var(--muted); margin: -4px 0 2px; }
+
+  /* Switchers are two counts, not two bars. */
+  .swrow { display: flex; align-items: baseline; justify-content: space-between; gap: 12px; padding: 4px 0; font-size: 13px; }
+  .swrow .n { font-family: var(--f-mono); font-size: 15px; color: var(--ink); font-variant-numeric: tabular-nums; }
+  .swrow .n em { font-style: normal; font-size: 12px; color: var(--muted); margin-left: 5px; }
 
   /* Where everyone is standing: one column per step, counts above, axis below. */
   .hist { display: grid; grid-auto-flow: column; grid-auto-columns: minmax(0, 1fr); gap: 6px; }
@@ -433,6 +439,7 @@
     <h1>Instructor console</h1>
     <p>Enter the instructor key to see student progress, emails, and feedback. The key stays on this device.</p>
     <input id="key" type="password" placeholder="Instructor key" aria-label="Instructor key" autocomplete="current-password">
+    <p class="hint">Hint: AI GSB lunch</p>
     <button class="primary" type="submit">Unlock</button>
     <p class="err" id="gate-err" role="alert" hidden></p>
   </form>
@@ -465,7 +472,7 @@
     </section>
     <section class="panel span-5" aria-labelledby="h-mix">
       <h2 id="h-mix">Base and Challenge</h2>
-      <p class="sub">Only the three steps where the two tracks differ. Each bar is split by how the students who finished that step did it. Switcher bars show the share of that track who crossed over.</p>
+      <p class="sub">Only the three steps where the two tracks differ. Each bar is split by how the students who finished that step did it.</p>
       <div class="rows" id="mix"></div>
     </section>
 
@@ -871,17 +878,15 @@
       return choice.some(function (id) { return s.steps[id] && s.levels[id] !== "challenge"; });
     }).length;
 
-    function sw(label, num, den, hint) {
-      var pct = den ? Math.round(num / den * 100) : 0;
-      return '<div class="row"><span class="lab">' + esc(label) + "</span>" +
-        '<div class="track" data-tip="' + esc(hint + ": " + num + " of " + den) + '"><span class="fill alt" style="width:' + pct + '%"></span></div>' +
-        '<span class="val">' + (den ? pct + "% <em class=\'pc\'>" + num + "/" + den + "</em>" : "none") + "</span></div>";
+    function sw(label, num, hint) {
+      return '<div class="swrow" data-tip="' + esc(hint) + '"><span>' + esc(label) + "</span>" +
+        '<span class="n">' + num + '<em>' + (num === 1 ? "student" : "students") + "</em></span></div>";
     }
 
     $("#mix").innerHTML = rows +
       '<p class="sub" style="padding-top:10px;padding-bottom:2px">Switchers</p>' +
-      sw("Base \u2192 Challenge", upCount, onBase.length, "Students set to Base who took Challenge on at least one step") +
-      sw("Challenge \u2192 Base", downCount, onChal.length, "Students set to Challenge who dropped to Base on at least one step") +
+      sw("Base \u2192 Challenge", upCount, "Set to Base, took Challenge on at least one step") +
+      sw("Challenge \u2192 Base", downCount, "Set to Challenge, dropped to Base on at least one step") +
       '<p class="legend" style="padding-top:10px"><span><i class="sw-base"></i>Base</span><span><i class="sw-chal"></i>Challenge</span></p>';
   }
 
